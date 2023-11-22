@@ -6,10 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PublishAot>false</PublishAot>
+	<PublishSingleFile>true</PublishSingleFile>
+	<PublishReadyToRun>true</PublishReadyToRun>
+	<PublishTrimmed>true</PublishTrimmed>
+	<RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' ">win-x64</RuntimeIdentifier>
+	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
+	<RuntimeIdentifier Condition=" '$(OS)' == 'Darwin' ">osx-x64</RuntimeIdentifier>
+	<SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Karambolo.Extensions.Logging.File" Version="3.5.0" />
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
