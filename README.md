@@ -1,0 +1,1 @@
+# OsuCollectionDownloader (v2)
