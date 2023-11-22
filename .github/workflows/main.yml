@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  windows_build:
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -22,23 +22,58 @@ jobs:
       run: dotnet restore
 
     - name: Build for Windows
-      run: dotnet build -c Release
-      if: runner.os == 'windows'
+      run: dotnet publish -c Release
+
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Release (Windows)
+        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\publish\
+
+  macos_build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Build for macOS
-      run: dotnet build -c Release
-      if: runner.os == 'macos'
+      run: dotnet publish -c Release
 
-    - name: Build for Linux
-      run: dotnet build -c Release
-      if: runner.os == 'linux'
-  upload:
-    needs: build
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Release (MacOS)
+        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
+
+  linux_build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Upload Release
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    - name: Build for Linux
+      run: dotnet publish -c Release
+
+    - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: Release
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release
+        name: Release (Linux)
+        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
