@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build_windows:
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
@@ -22,23 +22,58 @@ jobs:
       run: dotnet restore
 
     - name: Build for Windows
-      run: dotnet build -c Release
-      if: runner.os == 'windows'
+      run: dotnet build -c Release -r win10-x64
+
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Release (Windows)
+        path: bin/Release
+
+  build_macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore NuGet packages
+      run: dotnet restore
 
     - name: Build for macOS
       run: dotnet build -c Release
-      if: runner.os == 'macos'
 
-    - name: Build for Linux
-      run: dotnet build -c Release
-      if: runner.os == 'linux'
-  upload:
-    needs: build
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Release (MacOS)
+        path: bin/Release
+
+  build_linux:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Upload Release
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    - name: Build for Linux
+      run: dotnet build -c Release
+
+    - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: Release
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release
+        name: Release (Linux)
+        path: bin/Release
