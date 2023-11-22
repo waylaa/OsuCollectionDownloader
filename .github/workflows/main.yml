@@ -1,0 +1,51 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore NuGet packages
+      run: dotnet restore
+
+    - name: Build for Windows
+      run: dotnet build -c Release -r win10-x64
+      if: runner.os == 'windows'
+
+    - name: Build for macOS
+      run: dotnet build -c Release -r osx-x64
+      if: runner.os == 'macos'
+
+    - name: Build for Linux
+      run: dotnet build -c Release -r linux-x64
+      if: runner.os == 'linux'
+
+    - name: Copy artifacts to workspace
+      run: |
+        mkdir -p ${{ github.workspace }}/artifacts
+        cp -r bin/Release ${{ github.workspace }}/artifacts
+      if: success()
+
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release-Artifacts
+        path: ${{ github.workspace }}/artifacts
