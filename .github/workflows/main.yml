@@ -22,13 +22,13 @@ jobs:
       run: dotnet restore
 
     - name: Build for Windows
-      run: dotnet build -c Release -r win10-x64
+      run: dotnet build -c Release
 
     - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Release (Windows)
-        path: bin/Release
+        path: bin/Release/net8.0/win-x64
 
   build_macos:
     runs-on: macos-latest
@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Release (MacOS)
-        path: bin/Release
+        path: /bin/Release/net8.0/linux-x64
 
   build_linux:
     runs-on: ubuntu-latest
@@ -76,4 +76,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Release (Linux)
-        path: bin/Release
+        path: /bin/Release/net8.0/linux-x64
