@@ -22,15 +22,15 @@ jobs:
       run: dotnet restore
 
     - name: Build for Windows
-      run: dotnet build -c Release -r win10-x64
+      run: dotnet build -c Release
       if: runner.os == 'windows'
 
     - name: Build for macOS
-      run: dotnet build -c Release -r osx-x64
+      run: dotnet build -c Release
       if: runner.os == 'macos'
 
     - name: Build for Linux
-      run: dotnet build -c Release -r linux-x64
+      run: dotnet build -c Release
       if: runner.os == 'linux'
 
     - name: Copy artifacts to workspace
