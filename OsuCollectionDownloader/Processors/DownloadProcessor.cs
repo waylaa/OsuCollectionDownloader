@@ -21,6 +21,11 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
 
     internal async Task DownloadAsync(CancellationToken ct)
     {
+        if (!options.OsuSongsDirectory.FullName.Contains(Path.Combine("osu!", "Songs")))
+        {
+            logger.UnsupportedExtractionDirectory(options.OsuSongsDirectory.FullName);
+        }
+
         logger.OngoingCollectionFetch();
         Result<JsonDocument?> metadataResult = await GetMetadataAsync(options.Id, ct);
 
@@ -55,7 +60,7 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
             string beatmapFilePath = Path.Combine(options.OsuSongsDirectory.FullName, beatmapFileName.ReplaceInvalidPathChars());
             string beatmapInSongsDirectory = Path.Combine(options.OsuSongsDirectory.FullName, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
-            if (Directory.Exists(beatmapInSongsDirectory))
+            if (beatmapInSongsDirectory.Contains(Path.Combine("osu!", "Songs")) && Directory.Exists(beatmapInSongsDirectory))
             {
                 downloadedBeatmaps.Add(beatmap);
                 logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
