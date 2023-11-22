@@ -36,9 +36,8 @@ jobs:
     - name: Copy artifacts to workspace
       run: |
         mkdir -p ${{ github.workspace }}/artifacts
-        cp -r bin/Release ${{ github.workspace }}/artifacts
-      if: success()
-
+        cp -r ${{ github.workspace }}/OsuCollectionDownloader/bin/Release ${{ github.workspace }}/artifacts
+      if: always()
   upload:
     needs: build
     runs-on: ubuntu-latest
