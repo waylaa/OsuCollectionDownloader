@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Release (Windows)
-        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\publish
+        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\publish\
 
   macos_build:
     runs-on: macos-latest
@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Release (MacOS)
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish
+        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
 
   linux_build:
     runs-on: ubuntu-latest
@@ -76,4 +76,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Release (Linux)
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish
+        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
