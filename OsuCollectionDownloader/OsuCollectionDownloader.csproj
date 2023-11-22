@@ -8,7 +8,6 @@
 	<PublishAot>false</PublishAot>
 	<PublishSingleFile>true</PublishSingleFile>
 	<PublishReadyToRun>true</PublishReadyToRun>
-	<PublishTrimmed>true</PublishTrimmed>
 	<RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' ">win-x64</RuntimeIdentifier>
 	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
 	<RuntimeIdentifier Condition=" '$(OS)' == 'Darwin' ">osx-x64</RuntimeIdentifier>
