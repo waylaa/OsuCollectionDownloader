@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OsuCollectionDownloader": {
+      "commandName": "Project",
+      "commandLineArgs": "--id=9525 --osu-songs-directory=\"D:\\EXT\" --osdb-file-directory=\"C:\\Users\\Wayla\\Desktop\""
+    }
+  }
+}
