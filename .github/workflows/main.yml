@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build_windows:
+  windows_build:
     runs-on: windows-latest
 
     steps:
@@ -22,15 +22,15 @@ jobs:
       run: dotnet restore
 
     - name: Build for Windows
-      run: dotnet build -c Release
+      run: dotnet publish -c Release
 
     - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Release (Windows)
-        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\
+        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\publish
 
-  build_macos:
+  macos_build:
     runs-on: macos-latest
 
     steps:
@@ -46,15 +46,15 @@ jobs:
       run: dotnet restore
 
     - name: Build for macOS
-      run: dotnet build -c Release
+      run: dotnet publish -c Release
 
     - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Release (MacOS)
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/
+        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish
 
-  build_linux:
+  linux_build:
     runs-on: ubuntu-latest
 
     steps:
@@ -70,10 +70,10 @@ jobs:
       run: dotnet restore
 
     - name: Build for Linux
-      run: dotnet build -c Release
+      run: dotnet publish -c Release
 
     - name: Upload Release Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Release (Linux)
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/
+        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish
