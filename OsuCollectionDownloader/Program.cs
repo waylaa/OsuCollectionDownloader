@@ -54,13 +54,9 @@ internal sealed class Program
                     {
                         loggingBuilder
                         .AddConsole()
-#if DEBUG
-                        .SetMinimumLevel(LogLevel.Debug);
-#else
                         .AddFilter("System.Net.Http.HttpClient.*.LogicalHandler", LogLevel.Warning)
                         .AddFilter("System.Net.Http.HttpClient.*.ClientHandler", LogLevel.Warning)
                         .SetMinimumLevel(LogLevel.Information);
-#endif
                     })
                     .AddHttpClient<DownloadProcessor>(client =>
                     {
