@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace OsuCollectionDownloader.Objects;
+namespace OsuCollectionDownloader.Json.Models;
 
 internal sealed record ChildrenBeatmap(
     [property: JsonPropertyName("BeatmapId")] int BeatmapId,
@@ -31,7 +31,7 @@ internal sealed record ChildrenBeatmap(
 
 internal sealed record Datum(
     [property: JsonPropertyName("SetId")] int SetId,
-    [property: JsonPropertyName("ChildrenBeatmaps")] IImmutableList<ChildrenBeatmap> ChildrenBeatmaps,
+    [property: JsonPropertyName("ChildrenBeatmaps")] ImmutableArray<ChildrenBeatmap> ChildrenBeatmaps,
     [property: JsonPropertyName("RankedStatus")] int RankedStatus,
     [property: JsonPropertyName("ApprovedDate")] string ApprovedDate,
     [property: JsonPropertyName("LastUpdate")] DateTime LastUpdate,
@@ -48,4 +48,4 @@ internal sealed record Datum(
     [property: JsonPropertyName("Disabled")] bool Disabled
 );
 
-internal sealed record ChimuSearchResult([property: JsonPropertyName("data")] IImmutableList<Datum> Data);
+internal sealed record ChimuSearchResult([property: JsonPropertyName("data")] ImmutableArray<Datum> Data);

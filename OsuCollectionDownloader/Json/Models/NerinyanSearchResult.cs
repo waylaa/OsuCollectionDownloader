@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
-namespace OsuCollectionDownloader.Objects;
+namespace OsuCollectionDownloader.Json.Models;
 
 internal sealed record NerinyanAvailability(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
@@ -99,7 +99,7 @@ internal sealed record NerinyanSearchResult(
     [property: JsonPropertyName("submitted_date")] DateTime SubmittedDate,
     [property: JsonPropertyName("tags")] string Tags,
     [property: JsonPropertyName("has_favourited")] bool HasFavourited,
-    [property: JsonPropertyName("beatmaps")] IImmutableList<NerinyanBeatmap> Beatmaps,
+    [property: JsonPropertyName("beatmaps")] ImmutableArray<NerinyanBeatmap> Beatmaps,
     [property: JsonPropertyName("description")] string Description,
     [property: JsonPropertyName("genre")] NerinyanGenre Genre,
     [property: JsonPropertyName("language")] NerinyanLanguage Language,

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
-namespace OsuCollectionDownloader.Objects;
+namespace OsuCollectionDownloader.Json.Models;
 
 internal sealed record OsuDirectAvailability(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
@@ -16,16 +16,16 @@ internal sealed record OsuDirectBeatmap(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("user_id")] int UserId,
     [property: JsonPropertyName("version")] string Version,
-    [property: JsonPropertyName("accuracy")] int Accuracy,
-    [property: JsonPropertyName("ar")] int Ar,
-    [property: JsonPropertyName("bpm")] int Bpm,
+    [property: JsonPropertyName("accuracy")] double Accuracy,
+    [property: JsonPropertyName("ar")] double Ar,
+    [property: JsonPropertyName("bpm")] double Bpm,
     [property: JsonPropertyName("convert")] bool Convert,
     [property: JsonPropertyName("count_circles")] int CountCircles,
     [property: JsonPropertyName("count_sliders")] int CountSliders,
     [property: JsonPropertyName("count_spinners")] int CountSpinners,
-    [property: JsonPropertyName("cs")] int Cs,
+    [property: JsonPropertyName("cs")] double Cs,
     [property: JsonPropertyName("deleted_at")] object DeletedAt,
-    [property: JsonPropertyName("drain")] int Drain,
+    [property: JsonPropertyName("drain")] double Drain,
     [property: JsonPropertyName("hit_length")] int HitLength,
     [property: JsonPropertyName("is_scoreable")] bool IsScoreable,
     [property: JsonPropertyName("last_updated")] DateTime LastUpdated,
@@ -35,7 +35,7 @@ internal sealed record OsuDirectBeatmap(
     [property: JsonPropertyName("ranked")] int Ranked,
     [property: JsonPropertyName("url")] string Url,
     [property: JsonPropertyName("checksum")] string Checksum,
-    [property: JsonPropertyName("max_combo")] int MaxCombo
+    [property: JsonPropertyName("max_combo")] int? MaxCombo
 );
 
 internal sealed record OsuDirectCovers(
@@ -79,7 +79,7 @@ internal sealed record OsuDirectSearchResult(
     [property: JsonPropertyName("track_id")] object TrackId,
     [property: JsonPropertyName("user_id")] int UserId,
     [property: JsonPropertyName("video")] bool Video,
-    [property: JsonPropertyName("bpm")] int Bpm,
+    [property: JsonPropertyName("bpm")] double Bpm,
     [property: JsonPropertyName("can_be_hyped")] bool CanBeHyped,
     [property: JsonPropertyName("deleted_at")] object DeletedAt,
     [property: JsonPropertyName("discussion_enabled")] bool DiscussionEnabled,
@@ -89,10 +89,10 @@ internal sealed record OsuDirectSearchResult(
     [property: JsonPropertyName("legacy_thread_url")] string LegacyThreadUrl,
     [property: JsonPropertyName("nominations_summary")] OsuDirectNominationsSummary NominationsSummary,
     [property: JsonPropertyName("ranked")] int Ranked,
-    [property: JsonPropertyName("ranked_date")] DateTime RankedDate,
+    [property: JsonPropertyName("ranked_date")] DateTime? RankedDate,
     [property: JsonPropertyName("availability")] OsuDirectAvailability Availability,
     [property: JsonPropertyName("has_favourited")] bool HasFavourited,
-    [property: JsonPropertyName("beatmaps")] IImmutableList<OsuDirectBeatmap> Beatmaps,
-    [property: JsonPropertyName("pack_tags")] IImmutableList<string> PackTags,
-    [property: JsonPropertyName("modes")] IImmutableList<int> Modes
+    [property: JsonPropertyName("beatmaps")] ImmutableArray<OsuDirectBeatmap> Beatmaps,
+    [property: JsonPropertyName("pack_tags")] ImmutableArray<string> PackTags,
+    [property: JsonPropertyName("modes")] ImmutableArray<int> Modes
 );

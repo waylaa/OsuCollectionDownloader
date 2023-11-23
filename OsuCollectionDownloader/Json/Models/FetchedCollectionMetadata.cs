@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
-namespace OsuCollectionDownloader.Objects;
+namespace OsuCollectionDownloader.Json.Models;
 
 internal sealed record PartialBeatmap(
     [property: JsonPropertyName("checksum")] string Checksum,
@@ -9,7 +9,7 @@ internal sealed record PartialBeatmap(
 );
 
 internal sealed record PartialBeatmapset(
-    [property: JsonPropertyName("beatmaps")] IImmutableList<Beatmap> Beatmaps,
+    [property: JsonPropertyName("beatmaps")] IImmutableList<PartialBeatmap> Beatmaps,
     [property: JsonPropertyName("id")] int Id
 );
 
@@ -76,7 +76,7 @@ internal sealed record Modes(
     [property: JsonPropertyName("mania")] int Mania
 );
 
-internal sealed record Root(
+internal sealed record FetchedCollectionMetadata(
     [property: JsonPropertyName("dateUploaded")] DateUploaded DateUploaded,
     [property: JsonPropertyName("uploader")] Uploader Uploader,
     [property: JsonPropertyName("name")] string Name,

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
-namespace OsuCollectionDownloader.Objects;
+namespace OsuCollectionDownloader.Json.Models;
 
 internal sealed record Availability(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
@@ -20,7 +20,7 @@ internal sealed record Beatmap(
     [property: JsonPropertyName("mode")] string Mode,
     [property: JsonPropertyName("is_scoreable")] bool IsScoreable,
     [property: JsonPropertyName("playcount")] int Playcount,
-    [property: JsonPropertyName("max_combo")] int MaxCombo,
+    [property: JsonPropertyName("max_combo")] int? MaxCombo,
     [property: JsonPropertyName("checksum")] string Checksum,
     [property: JsonPropertyName("ranked")] int Ranked,
     [property: JsonPropertyName("total_length")] int TotalLength,
@@ -97,7 +97,7 @@ internal sealed record NominationsSummary(
 );
 
 internal sealed record FetchedCollection(
-    [property: JsonPropertyName("nextPageCursor")] int NextPageCursor,
+    [property: JsonPropertyName("nextPageCursor")] int? NextPageCursor,
     [property: JsonPropertyName("hasMore")] bool HasMore,
     [property: JsonPropertyName("beatmaps")] IImmutableList<Beatmap> Beatmaps
 );
