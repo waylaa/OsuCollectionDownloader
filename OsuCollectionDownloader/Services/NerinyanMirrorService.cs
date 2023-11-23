@@ -35,7 +35,11 @@ internal class NerinyanMirrorService(HttpClient client) : IMirrorService
 
     public async Task<Result<object?>> SearchAsync(string query, CancellationToken token)
     {
-        var filterRange = new { min = 0, max = 0 };
+        JsonObject filterRange = new()
+        {
+            ["min"] = 0,
+            ["max"] = 0
+        };
 
         JsonObject searchPayload = new()
         {
@@ -44,14 +48,14 @@ internal class NerinyanMirrorService(HttpClient client) : IMirrorService
             ["nsfw"] = true,
             ["option"] = string.Empty,
             ["m"] = string.Empty,
-            ["totalLength"] = JsonSerializer.SerializeToNode(filterRange),
-            ["maxCombo"] = JsonSerializer.SerializeToNode(filterRange),
-            ["difficultyRating"] = JsonSerializer.SerializeToNode(filterRange),
-            ["accuracy"] = JsonSerializer.SerializeToNode(filterRange),
-            ["ar"] = JsonSerializer.SerializeToNode(filterRange),
-            ["cs"] = JsonSerializer.SerializeToNode(filterRange),
-            ["drain"] = JsonSerializer.SerializeToNode(filterRange),
-            ["bpm"] = JsonSerializer.SerializeToNode(filterRange),
+            ["totalLength"] = filterRange,
+            ["maxCombo"] = filterRange,
+            ["difficultyRating"] = filterRange,
+            ["accuracy"] = filterRange,
+            ["ar"] = filterRange,
+            ["cs"] = filterRange,
+            ["drain"] = filterRange,
+            ["bpm"] = filterRange,
             ["sort"] = "title_desc",
             ["page"] = 0,
             ["query"] = query
