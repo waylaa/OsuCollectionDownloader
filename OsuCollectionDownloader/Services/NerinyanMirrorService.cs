@@ -1,4 +1,5 @@
-﻿using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Json.Contexts;
+using OsuCollectionDownloader.Objects;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -32,7 +33,7 @@ internal class NerinyanMirrorService(HttpClient client) : IMirrorService
         }
     }
 
-    public async Task<Result<JsonDocument?>> SearchAsync(string query, CancellationToken token)
+    public async Task<Result<object?>> SearchAsync(string query, CancellationToken token)
     {
         var filterRange = new { min = 0, max = 0 };
 
@@ -61,7 +62,12 @@ internal class NerinyanMirrorService(HttpClient client) : IMirrorService
 
         try
         {
-            return await client.GetFromJsonAsync<JsonDocument>($"{BaseApiUrl}/search?b64={encodedSearchPayloadData}&ps=60", token);
+            return await client.GetFromJsonAsync
+            (
+                $"{BaseApiUrl}/search?b64={encodedSearchPayloadData}&ps=60",
+                NerinyanSearchResultSerializationContext.Default.ImmutableArrayNerinyanSearchResult,
+                token
+            );
         }
         catch (HttpRequestException ex)
         {

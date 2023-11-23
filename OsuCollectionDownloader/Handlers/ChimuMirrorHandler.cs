@@ -1,6 +1,6 @@
-﻿using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Json.Models;
+using OsuCollectionDownloader.Objects;
 using OsuCollectionDownloader.Services;
-using System.Text.Json;
 
 namespace OsuCollectionDownloader.Handlers;
 
@@ -8,20 +8,20 @@ internal sealed class ChimuMirrorHandler(IMirrorService service) : IMirrorHandle
 {
     public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
     {
-        Result<JsonDocument?> searchResult = await service.SearchAsync(title, token);
+        Result<object?> searchResult = await service.SearchAsync(title, token);
 
-        if (!searchResult.IsSuccessful || !searchResult.HasValue)
+        if (!searchResult.IsSuccessful ||
+            !searchResult.HasValue ||
+            searchResult.Value is not ChimuSearchResult value)
         {
             return false;
         }
 
         // Get the correct beatmapset id by checking the source and result difficulty names. If they're the same, they're referring to the same beatmap.
-        int beatmapSetId = searchResult.Value!.RootElement
-            .GetProperty("data")
-            .EnumerateArray()
-            .SelectMany(results => results.GetProperty("ChildrenBeatmaps").EnumerateArray())
-            .Where(beatmap => beatmap.GetProperty("DiffName").GetString() == difficultyName)
-            .Select(correspondingBeatmap => correspondingBeatmap.GetProperty("ParentSetId").GetInt32())
+        int beatmapSetId = value.Data
+            .SelectMany(results => results.ChildrenBeatmaps)
+            .Where(beatmap => beatmap.DiffName == difficultyName)
+            .Select(correspondingBeatmap => correspondingBeatmap.ParentSetId)
             .FirstOrDefault();
 
         if (beatmapSetId == default)

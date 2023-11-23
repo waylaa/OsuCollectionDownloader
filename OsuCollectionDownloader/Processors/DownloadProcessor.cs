@@ -2,6 +2,8 @@
 using OsuCollectionDownloader.Core.Extensions;
 using OsuCollectionDownloader.Handlers;
 using OsuCollectionDownloader.Handlers.Chains;
+using OsuCollectionDownloader.Json.Contexts;
+using OsuCollectionDownloader.Json.Models;
 using OsuCollectionDownloader.Logging;
 using OsuCollectionDownloader.Objects;
 using OsuCollectionDownloader.Services;
@@ -9,7 +11,6 @@ using System.Collections.Immutable;
 using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json;
 
 namespace OsuCollectionDownloader.Processors;
 
@@ -27,7 +28,7 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
         }
 
         logger.OngoingCollectionFetch();
-        Result<JsonDocument?> metadataResult = await GetMetadataAsync(options.Id, ct);
+        Result<FetchedCollectionMetadata?> metadataResult = await GetMetadataAsync(options.Id, ct);
 
         if (!metadataResult.IsSuccessful || !metadataResult.HasValue)
         {
@@ -35,9 +36,9 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
             return;
         }
 
-        Result<ImmutableList<JsonElement>> fetchedBeatmapsResult = await GetBeatmapsAsync(options.Id, ct);
+        Result<ImmutableList<Beatmap>> fetchedBeatmapsResult = await GetBeatmapsAsync(options.Id, ct);
 
-        if (!fetchedBeatmapsResult.IsSuccessful || !fetchedBeatmapsResult.HasValue)
+        if (!fetchedBeatmapsResult.IsSuccessful || !fetchedBeatmapsResult.HasValue || fetchedBeatmapsResult.Value.IsEmpty)
         {
             logger.UnsuccessfulCollectionFetch();
             return;
@@ -50,13 +51,11 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
             new OsuDirectMirrorHandler(new OsuDirectService(_client)),
         ];
 
-        List<JsonElement> downloadedBeatmaps = [];
+        List<Beatmap> downloadedBeatmaps = [];
         
-        foreach (JsonElement beatmap in fetchedBeatmapsResult.Value!)
+        foreach (Beatmap beatmap in fetchedBeatmapsResult.Value)
         {
-            string beatmapFileName = $"{beatmap.GetProperty("beatmapset_id").GetInt32()} " +
-                $"{beatmap.GetProperty("beatmapset").GetProperty("artist").GetString()} - {beatmap.GetProperty("beatmapset").GetProperty("title").GetString()}.osz";
-
+            string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
             string beatmapFilePath = Path.Combine(options.OsuSongsDirectory.FullName, beatmapFileName.ReplaceInvalidPathChars());
             string beatmapInSongsDirectory = Path.Combine(options.OsuSongsDirectory.FullName, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
@@ -70,8 +69,8 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
 
             Result<bool> downloadResult = await mirrorChain.HandleAsync
             (
-                beatmap.GetProperty("beatmapset").GetProperty("title").GetString()!,
-                beatmap.GetProperty("version").GetString()!,
+                beatmap.Beatmapset.Title,
+                beatmap.Version,
                 beatmapFilePath,
                 ct
             );
@@ -99,18 +98,21 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
 
         if (options.OsdbFileDirectory is not null)
         {
-            await GenerateOsdbCollectionAsync(metadataResult.Value!.RootElement, [.. downloadedBeatmaps]);
+            await GenerateOsdbCollectionAsync(metadataResult.Value!, [.. downloadedBeatmaps]);
             logger.OsdbCollectionSuccessfulGeneration(options.OsdbFileDirectory!.FullName);
         }
-
-        metadataResult.Value?.Dispose();
     }
 
-    private async Task<Result<JsonDocument?>> GetMetadataAsync(int id, CancellationToken ct)
+    private async Task<Result<FetchedCollectionMetadata?>> GetMetadataAsync(int id, CancellationToken ct)
     {
         try
         {
-            return await _client.GetFromJsonAsync<JsonDocument>($"{OsuCollectorApiUrl}/collections/{id}", ct);
+            return await _client.GetFromJsonAsync
+            (
+                $"{OsuCollectorApiUrl}/collections/{id}",
+                FetchedCollectionMetadataSerializationContext.Default.FetchedCollectionMetadata,
+                ct
+            );
         }
         catch (Exception ex)
         {
@@ -118,36 +120,42 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
         }
     }
 
-    private async Task<Result<ImmutableList<JsonElement>>> GetBeatmapsAsync(int id, CancellationToken ct)
+    private async Task<Result<ImmutableList<Beatmap>>> GetBeatmapsAsync(int id, CancellationToken ct)
     {
         try
         {
-            List<JsonElement> beatmaps = [];
-            JsonDocument? collection = await _client.GetFromJsonAsync<JsonDocument>($"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor=0&perPage=100", ct);
+            List<Beatmap> beatmaps = [];
+
+            FetchedCollection? collection = await _client.GetFromJsonAsync
+            (
+                $"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor=0&perPage=100",
+                FetchedCollectionSerializationContext.Default.FetchedCollection,
+                ct
+            );
 
             if (collection is null)
             {
-                return ImmutableList<JsonElement>.Empty;
+                return ImmutableList<Beatmap>.Empty;
             }
 
             do
             {
-                beatmaps.AddRange(collection.RootElement.GetProperty("beatmaps").EnumerateArray());
+                beatmaps.AddRange(collection.Beatmaps);
 
-                collection = await _client.GetFromJsonAsync<JsonDocument>
+                collection = await _client.GetFromJsonAsync
                 (
-                    $"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor={collection.RootElement.GetProperty("nextPageCursor").GetInt32()}&perPage=100",
+                    $"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor={collection.NextPageCursor}&perPage=100",
+                    FetchedCollectionSerializationContext.Default.FetchedCollection,
                     ct
                 );
 
                 if (collection is null)
                 {
-                    return ImmutableList<JsonElement>.Empty;
+                    return ImmutableList<Beatmap>.Empty;
                 }
 
-            } while (collection.RootElement.GetProperty("hasMore").GetBoolean() == true);
+            } while (collection.HasMore);
 
-            collection.Dispose();
             return beatmaps.ToImmutableList();
         }
         catch (Exception ex)
@@ -175,13 +183,9 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
         }
     }
 
-    public async ValueTask GenerateOsdbCollectionAsync(JsonElement metadata, ImmutableList<JsonElement> downloadedBeatmaps)
+    public async ValueTask GenerateOsdbCollectionAsync(FetchedCollectionMetadata metadata, ImmutableList<Beatmap> downloadedBeatmaps)
     {
-        string osdbFilePath = Path.Combine
-        (
-            options.OsdbFileDirectory!.FullName,
-            $"{metadata.GetProperty("name").GetString()!.ReplaceInvalidPathChars()}.osdb"
-        );
+        string osdbFilePath = Path.Combine(options.OsdbFileDirectory!.FullName, $"{metadata.Name.ReplaceInvalidPathChars()}.osdb");
 
         await using FileStream osdbFileStream = File.OpenWrite(osdbFilePath);
         await using (BinaryWriter osdbVersionWriter = new(osdbFileStream, Encoding.UTF8, leaveOpen: true))
@@ -194,23 +198,23 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
 
         osdbWriter.Write("o!dm8");
         osdbWriter.Write(DateTime.Now.ToOADate());
-        osdbWriter.Write(metadata.GetProperty("uploader").GetProperty("username").GetString()!);
+        osdbWriter.Write(metadata.Uploader.Username);
         osdbWriter.Write(1); // Number of collections.
-        osdbWriter.Write(metadata.GetProperty("name").GetString()!);
+        osdbWriter.Write(metadata.Name);
         osdbWriter.Write(0); // OsuStats online id.
         osdbWriter.Write(downloadedBeatmaps.Count);
 
-        foreach (JsonElement beatmap in downloadedBeatmaps)
+        foreach (Beatmap beatmap in downloadedBeatmaps)
         {
-            osdbWriter.Write(beatmap.GetProperty("id").GetInt32());
-            osdbWriter.Write(beatmap.GetProperty("beatmapset_id").GetInt32());
-            osdbWriter.Write(beatmap.GetProperty("beatmapset").GetProperty("artist").GetString()!);
-            osdbWriter.Write(beatmap.GetProperty("beatmapset").GetProperty("title").GetString()!);
-            osdbWriter.Write(beatmap.GetProperty("version").GetString()!); // Difficulty name.
-            osdbWriter.Write(beatmap.GetProperty("checksum").GetString()!);
+            osdbWriter.Write(beatmap.Id);
+            osdbWriter.Write(beatmap.BeatmapsetId);
+            osdbWriter.Write(beatmap.Beatmapset.Artist);
+            osdbWriter.Write(beatmap.Beatmapset.Title);
+            osdbWriter.Write(beatmap.Version); // Difficulty name.
+            osdbWriter.Write(beatmap.Checksum);
             osdbWriter.Write(string.Empty); // Beatmapset's user comments.
-            osdbWriter.Write((byte)beatmap.GetProperty("mode_int").GetInt32());
-            osdbWriter.Write(beatmap.GetProperty("difficulty_rating").GetDouble());
+            osdbWriter.Write((byte)beatmap.ModeInt);
+            osdbWriter.Write(beatmap.DifficultyRating);
         }
 
         osdbWriter.Write(0); // Beatmaps that contain hashes only.

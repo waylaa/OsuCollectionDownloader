@@ -1,6 +1,6 @@
-﻿using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Json.Contexts;
+using OsuCollectionDownloader.Objects;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace OsuCollectionDownloader.Services;
 
@@ -30,11 +30,16 @@ internal sealed class ChimuService(HttpClient client) : IMirrorService
         }
     }
 
-    public async Task<Result<JsonDocument?>> SearchAsync(string query, CancellationToken token)
+    public async Task<Result<object?>> SearchAsync(string query, CancellationToken token)
     {
         try
         {
-            return await client.GetFromJsonAsync<JsonDocument>($"{BaseApiUrl}/search?size=40&offset=0&query={Uri.EscapeDataString(query)}", token);
+            return await client.GetFromJsonAsync
+            (
+                $"{BaseApiUrl}/search?size=40&offset=0&query={Uri.EscapeDataString(query)}",
+                ChimuSearchResultSerializationContext.Default.ChimuSearchResult,
+                token
+            );
         }
         catch (HttpRequestException ex)
         {

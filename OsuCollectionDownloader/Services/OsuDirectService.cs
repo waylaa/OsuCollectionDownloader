@@ -1,4 +1,5 @@
-﻿using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Json.Contexts;
+using OsuCollectionDownloader.Objects;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -30,11 +31,16 @@ internal sealed class OsuDirectService(HttpClient client) : IMirrorService
         }
     }
 
-    public async Task<Result<JsonDocument?>> SearchAsync(string query, CancellationToken token)
+    public async Task<Result<object?>> SearchAsync(string query, CancellationToken token)
     {
         try
         {
-            return await client.GetFromJsonAsync<JsonDocument>($"{BaseApiUrl}/v2/search?amount=100&offset=0&q={Uri.EscapeDataString(query)}&mode=&status=", token);
+            return await client.GetFromJsonAsync
+            (
+                $"{BaseApiUrl}/v2/search?amount=100&offset=0&q={Uri.EscapeDataString(query)}&mode=&status=",
+                OsuDirectSearchResultSerializationContext.Default.ImmutableArrayOsuDirectSearchResult,
+                token
+            );
         }
         catch (HttpRequestException ex)
         {
