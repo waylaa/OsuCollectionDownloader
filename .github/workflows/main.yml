@@ -37,6 +37,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install required dependencies for AOT publishing
+      run: brew install llvm-objcopy
+
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
