@@ -18,14 +18,8 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
-
     - name: Build for Windows (x64)
       run: dotnet publish -c Release -r win-x64
-
-    - name: Build for Windows (arm64)
-      run: dotnet publish -c Release -r win-arm64
 
     - name: Upload x64 Release
       uses: actions/upload-artifact@v3
@@ -33,13 +27,7 @@ jobs:
         name: Release (Windows)
         path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-x64\publish\
 
-    - name: Upload arm64 Release
-      uses: actions/upload-artifact@v3
-      with:
-        name: Release (Windows)
-        path: D:\a\OsuCollectionDownloader\OsuCollectionDownloader\OsuCollectionDownloader\bin\Release\net8.0\win-arm64\publish\
-
-  macos_x64_build:
+  macos_build:
     runs-on: macos-latest
 
     steps:
@@ -54,26 +42,14 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
-
     - name: Build for MacOS (x64)
       run: dotnet publish -c Release -r osx-x64
-
-    - name: Build for MacOS (arm64)
-      run: dotnet publish -c Release -r osx-arm64
       
-    - name: Upload x64 Release
+    - name: Upload Release
       uses: actions/upload-artifact@v3
       with:
         name: Release (MacOS)
-        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
-
-    - name: Upload arm64 Release
-      uses: actions/upload-artifact@v3
-      with:
-        name: Release (MacOS)
-        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-arm64/publish/
+        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/osx-x64/publish/
 
   linux_build:
     runs-on: ubuntu-latest
@@ -87,23 +63,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
-
     - name: Build for Linux (x64)
       run: dotnet publish -c Release -r linux-x64
-
-    - name: Build for Linux (arm64)
-      run: dotnet publish -c Release -r linux-arm64
 
     - name: Upload x64 Release
       uses: actions/upload-artifact@v3
       with:
         name: Release (Linux)
         path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
-        
-    - name: Upload arm64 Release
-      uses: actions/upload-artifact@v3
-      with:
-        name: Release (Linux)
-        path: /home/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-arm64/publish/
