@@ -1,5 +1,7 @@
 # OsuCollectionDownloader
 
+[![Build and Release](https://github.com/waylaa/OsuCollectionDownloader/actions/workflows/main.yml/badge.svg)](https://github.com/waylaa/OsuCollectionDownloader/actions/workflows/main.yml)
+
 OsuCollectionDownloader is a simple command-line application for downloading collections from [osu!collector](https://osucollector.com/) and optionally, using those collections to generate .osdb files which can be used by [Piotrekol's Collection Manager](https://github.com/Piotrekol/CollectionManager) for collection importing and sharing.
 
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
