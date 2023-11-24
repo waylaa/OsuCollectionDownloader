@@ -13,7 +13,7 @@ I strongly advise not use this application irresponsibly and instead support [os
 - Make sure you have .NET 8 installed on your machine.
 - If not installed, download and install it from [here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 
-### 3. Clone the Repository
+### 3. Clone
 - Open your terminal or command prompt.
 - Navigate to the directory where you want to clone the repository:
 ```
