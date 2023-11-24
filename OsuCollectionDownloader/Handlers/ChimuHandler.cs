@@ -4,7 +4,7 @@ using OsuCollectionDownloader.Services;
 
 namespace OsuCollectionDownloader.Handlers;
 
-internal sealed class ChimuHandler(IBeatmapService service) : IServiceHandler
+internal sealed class ChimuHandler(IBeatmapMirrorService service) : IBeatmapMirrorHandler
 {
     public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
     {

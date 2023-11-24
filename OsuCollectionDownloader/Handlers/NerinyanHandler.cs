@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace OsuCollectionDownloader.Handlers;
 
-internal class NerinyanHandler(IBeatmapService service) : IServiceHandler
+internal class NerinyanHandler(IBeatmapMirrorService service) : IBeatmapMirrorHandler
 {
     public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
     {

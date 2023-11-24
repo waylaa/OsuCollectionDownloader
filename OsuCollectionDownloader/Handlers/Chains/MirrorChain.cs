@@ -3,11 +3,11 @@ using System.Collections;
 
 namespace OsuCollectionDownloader.Handlers.Chains;
 
-internal sealed class MirrorChain : IEnumerable<IServiceHandler>
+internal sealed class MirrorChain : IEnumerable<IBeatmapMirrorHandler>
 {
-    private ISet<IServiceHandler> Mirrors { get; } = new HashSet<IServiceHandler>();
+    private ISet<IBeatmapMirrorHandler> Mirrors { get; } = new HashSet<IBeatmapMirrorHandler>();
 
-    public IEnumerator<IServiceHandler> GetEnumerator()
+    public IEnumerator<IBeatmapMirrorHandler> GetEnumerator()
         => Mirrors.GetEnumerator();
 
     public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
@@ -17,7 +17,7 @@ internal sealed class MirrorChain : IEnumerable<IServiceHandler>
             return false;
         }
 
-        foreach (IServiceHandler handler in Mirrors)
+        foreach (IBeatmapMirrorHandler handler in Mirrors)
         {
             Result<bool> result = await handler.HandleAsync(title, difficultyName, filePath, token);
 
@@ -32,7 +32,7 @@ internal sealed class MirrorChain : IEnumerable<IServiceHandler>
         return false;
     }
 
-    internal MirrorChain Add(IServiceHandler handler)
+    internal MirrorChain Add(IBeatmapMirrorHandler handler)
     {
         Mirrors.Add(handler);
         return this;

@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace OsuCollectionDownloader.Handlers;
 
-internal sealed class OsuDirectHandler(IBeatmapService service) : IServiceHandler
+internal sealed class OsuDirectHandler(IBeatmapMirrorService service) : IBeatmapMirrorHandler
 {
     public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
     {
