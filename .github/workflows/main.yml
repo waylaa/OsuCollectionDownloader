@@ -18,13 +18,10 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
+    - name: Build for Windows (x64)
+      run: dotnet publish -c Release -r win-x64
 
-    - name: Build for Windows
-      run: dotnet publish -c Release
-
-    - name: Upload Release Artifacts
+    - name: Upload x64 Release
       uses: actions/upload-artifact@v3
       with:
         name: Release (Windows)
@@ -37,22 +34,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Install required dependencies for AOT publishing
+      run: brew install binutils
+
     - name: Set up .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
-
-    - name: Build for macOS
-      run: dotnet publish -c Release
-
-    - name: Upload Release Artifacts
+    - name: Build for MacOS (x64)
+      run: dotnet publish -c Release -r osx-x64
+      
+    - name: Upload Release
       uses: actions/upload-artifact@v3
       with:
         name: Release (MacOS)
-        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/linux-x64/publish/
+        path: /Users/runner/work/OsuCollectionDownloader/OsuCollectionDownloader/OsuCollectionDownloader/bin/Release/net8.0/osx-x64/publish/
 
   linux_build:
     runs-on: ubuntu-latest
@@ -66,13 +63,10 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Restore NuGet packages
-      run: dotnet restore
+    - name: Build for Linux (x64)
+      run: dotnet publish -c Release -r linux-x64
 
-    - name: Build for Linux
-      run: dotnet publish -c Release
-
-    - name: Upload Release Artifacts
+    - name: Upload x64 Release
       uses: actions/upload-artifact@v3
       with:
         name: Release (Linux)
