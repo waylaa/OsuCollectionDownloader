@@ -7,9 +7,9 @@ using System.Text.Json.Nodes;
 
 namespace OsuCollectionDownloader.Services;
 
-internal class NerinyanMirrorService(HttpClient client) : IMirrorService
+internal sealed class NerinyanService(HttpClient client) : IBeatmapService
 {
-    public string BaseApiUrl => "https://api.nerinyan.moe";
+    private const string BaseApiUrl = "https://api.nerinyan.moe";
 
     public async Task<Result<bool>> DownloadAsync(string filePath, int beatmapSetId, CancellationToken token)
     {

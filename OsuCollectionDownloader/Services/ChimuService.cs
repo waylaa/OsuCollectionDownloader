@@ -4,9 +4,9 @@ using System.Net.Http.Json;
 
 namespace OsuCollectionDownloader.Services;
 
-internal sealed class ChimuService(HttpClient client) : IMirrorService
+internal sealed class ChimuService(HttpClient client) : IBeatmapService
 {
-    public string BaseApiUrl => "https://api.chimu.moe/v1";
+    private const string BaseApiUrl = "https://api.chimu.moe/v1";
 
     public async Task<Result<bool>> DownloadAsync(string filePath, int beatmapSetId, CancellationToken token)
     {

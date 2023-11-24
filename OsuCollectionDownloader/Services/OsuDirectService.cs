@@ -5,9 +5,9 @@ using System.Text.Json;
 
 namespace OsuCollectionDownloader.Services;
 
-internal sealed class OsuDirectService(HttpClient client) : IMirrorService
+internal sealed class OsuDirectService(HttpClient client) : IBeatmapService
 {
-    public string BaseApiUrl => "https://api.osu.direct";
+    private const string BaseApiUrl = "https://api.osu.direct";
 
     public async Task<Result<bool>> DownloadAsync(string filePath, int beatmapSetId, CancellationToken token)
     {
