@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OsuCollectionDownloader.Processors;
+using OsuCollectionDownloader.Services;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -38,6 +39,7 @@ internal sealed class Program
                     ctx.ParseResult.GetValueForOption(osuSongsDirectory)!,
                     ctx.ParseResult.GetValueForOption(osdbFileDirectory)
                 ),
+                ctx.BindingContext.GetRequiredService<OsuCollectorService>(),
                 ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
                 ctx.BindingContext.GetRequiredService<ILogger<DownloadProcessor>>()
             );
@@ -65,6 +67,7 @@ internal sealed class Program
                         client.DefaultRequestHeaders.Accept.Add(new("application/octet-stream"));
                     })
                     .Services
+                    .AddSingleton<OsuCollectorService>()
                     .BuildServiceProvider();
 
                 middleware.BindingContext.AddService(_ => provider.GetRequiredService<IHttpClientFactory>());

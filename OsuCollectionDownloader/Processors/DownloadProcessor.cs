@@ -14,7 +14,7 @@ using System.Text;
 
 namespace OsuCollectionDownloader.Processors;
 
-internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpClientFactory httpClientFactory, ILogger<DownloadProcessor> logger)
+internal sealed class DownloadProcessor(DownloadProcessorOptions options, OsuCollectorService service, IHttpClientFactory httpClientFactory, ILogger<DownloadProcessor> logger)
 {
     private const string OsuCollectorApiUrl = "https://osucollector.com/api";
 
@@ -28,7 +28,7 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
         }
 
         logger.OngoingCollectionFetch();
-        Result<FetchedCollectionMetadata?> metadataResult = await GetMetadataAsync(options.Id, ct);
+        Result<FetchedCollectionMetadata?> metadataResult = await service.GetMetadataAsync(options.Id, ct);
 
         if (!metadataResult.IsSuccessful || !metadataResult.HasValue)
         {
@@ -36,7 +36,7 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
             return;
         }
 
-        Result<ImmutableList<Beatmap>> fetchedBeatmapsResult = await GetBeatmapsAsync(options.Id, ct);
+        Result<ImmutableList<Beatmap>> fetchedBeatmapsResult = await service.GetBeatmapsAsync(options.Id, ct);
 
         if (!fetchedBeatmapsResult.IsSuccessful || !fetchedBeatmapsResult.HasValue || fetchedBeatmapsResult.Value.IsEmpty)
         {
@@ -46,9 +46,9 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
 
         MirrorChain mirrorChain =
         [
-            new NerinyanMirrorHandler(new NerinyanMirrorService(_client)),
-            new ChimuMirrorHandler(new ChimuService(_client)),
-            new OsuDirectMirrorHandler(new OsuDirectService(_client)),
+            new NerinyanHandler(new NerinyanService(_client)),
+            new ChimuHandler(new ChimuService(_client)),
+            new OsuDirectHandler(new OsuDirectService(_client)),
         ];
 
         List<Beatmap> downloadedBeatmaps = [];
@@ -103,74 +103,13 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, IHttpC
         }
     }
 
-    private async Task<Result<FetchedCollectionMetadata?>> GetMetadataAsync(int id, CancellationToken ct)
-    {
-        try
-        {
-            return await _client.GetFromJsonAsync
-            (
-                $"{OsuCollectorApiUrl}/collections/{id}",
-                FetchedCollectionMetadataSerializationContext.Default.FetchedCollectionMetadata,
-                ct
-            );
-        }
-        catch (Exception ex)
-        {
-            return ex;
-        }
-    }
-
-    private async Task<Result<ImmutableList<Beatmap>>> GetBeatmapsAsync(int id, CancellationToken ct)
-    {
-        try
-        {
-            List<Beatmap> beatmaps = [];
-
-            FetchedCollection? collection = await _client.GetFromJsonAsync
-            (
-                $"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor=0&perPage=100",
-                FetchedCollectionSerializationContext.Default.FetchedCollection,
-                ct
-            );
-
-            if (collection is null)
-            {
-                return ImmutableList<Beatmap>.Empty;
-            }
-
-            do
-            {
-                beatmaps.AddRange(collection.Beatmaps);
-
-                collection = await _client.GetFromJsonAsync
-                (
-                    $"{OsuCollectorApiUrl}/collections/{id}/beatmapsv2?cursor={collection.NextPageCursor}&perPage=100",
-                    FetchedCollectionSerializationContext.Default.FetchedCollection,
-                    ct
-                );
-
-                if (collection is null)
-                {
-                    return ImmutableList<Beatmap>.Empty;
-                }
-
-            } while (collection.HasMore);
-
-            return beatmaps.ToImmutableList();
-        }
-        catch (Exception ex)
-        {
-            return ex;
-        }
-    }
-
     private Result<bool> Extract(string sourceBeatmapFilePath)
     {
         try
         {
             ZipFile.ExtractToDirectory
             (
-                sourceBeatmapFilePath,
+            sourceBeatmapFilePath,
                 Path.Combine(options.OsuSongsDirectory.FullName, Path.GetFileNameWithoutExtension(sourceBeatmapFilePath)),
                 overwriteFiles: true
             );
