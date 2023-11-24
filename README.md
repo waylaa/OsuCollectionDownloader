@@ -1,11 +1,10 @@
 # OsuCollectionDownloader
 
-[![Build and Release](https://github.com/waylaa/OsuCollectionDownloader/actions/workflows/main.yml/badge.svg)](https://github.com/waylaa/OsuCollectionDownloader/actions/workflows/main.yml)
-
 OsuCollectionDownloader is a simple command-line application for downloading collections from [osu!collector](https://osucollector.com/) and optionally, using those collections to generate .osdb files which can be used by [Piotrekol's Collection Manager](https://github.com/Piotrekol/CollectionManager) for collection importing and sharing.
 
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
-## Installation
+
+## Building/Contributing
 
 ### 1. Prerequisites
   - .NET desktop development
@@ -29,6 +28,7 @@ git clone https://github.com/waylaa/OsuCollectionDownloader.git
 
 - Open the .sln file, restore the nuget packages and you're done.
 ## Usage
+Get the builds from [here](https://github.com/waylaa/OsuCollectionDownloader/actions) and click on the latest workflow run.
 
 ### Windows 10/11
 
