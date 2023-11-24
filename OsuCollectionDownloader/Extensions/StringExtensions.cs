@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace OsuCollectionDownloader.Core.Extensions;
+namespace OsuCollectionDownloader.Extensions;
 
 internal static class StringExtensions
 {

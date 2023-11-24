@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using OsuCollectionDownloader.Core.Extensions;
+using OsuCollectionDownloader.Extensions;
 using OsuCollectionDownloader.Handlers;
 using OsuCollectionDownloader.Handlers.Chains;
 using OsuCollectionDownloader.Json.Contexts;
