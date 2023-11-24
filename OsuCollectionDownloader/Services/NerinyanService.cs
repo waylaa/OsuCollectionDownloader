@@ -7,7 +7,7 @@ using System.Text.Json.Nodes;
 
 namespace OsuCollectionDownloader.Services;
 
-internal sealed class NerinyanService(HttpClient client) : IBeatmapService
+internal sealed class NerinyanService(HttpClient client) : IBeatmapMirrorService
 {
     private const string BaseApiUrl = "https://api.nerinyan.moe";
 

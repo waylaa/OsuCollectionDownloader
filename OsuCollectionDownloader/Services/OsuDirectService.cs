@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace OsuCollectionDownloader.Services;
 
-internal sealed class OsuDirectService(HttpClient client) : IBeatmapService
+internal sealed class OsuDirectService(HttpClient client) : IBeatmapMirrorService
 {
     private const string BaseApiUrl = "https://api.osu.direct";
 

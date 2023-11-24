@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace OsuCollectionDownloader.Services;
 
-internal interface IBeatmapService
+internal interface IBeatmapMirrorService
 {
     Task<Result<object?>> SearchAsync(string query, CancellationToken token);
 

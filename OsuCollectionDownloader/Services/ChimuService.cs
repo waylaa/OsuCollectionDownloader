@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace OsuCollectionDownloader.Services;
 
-internal sealed class ChimuService(HttpClient client) : IBeatmapService
+internal sealed class ChimuService(HttpClient client) : IBeatmapMirrorService
 {
     private const string BaseApiUrl = "https://api.chimu.moe/v1";
 
