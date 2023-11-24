@@ -5,11 +5,15 @@ OsuCollectionDownloader is a simple command-line application for downloading col
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
 ## Installation
 
-### 1. Install .NET 8
+### 1. Prerequisites
+  - .NET desktop development
+  - Desktop development with C++ (Used for AOT publishing)
+    
+### 2. Install .NET 8
 - Make sure you have .NET 8 installed on your machine.
 - If not installed, download and install it from [here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 
-### 2. Clone the Repository
+### 3. Clone the Repository
 - Open your terminal or command prompt.
 - Navigate to the directory where you want to clone the repository:
 ```
