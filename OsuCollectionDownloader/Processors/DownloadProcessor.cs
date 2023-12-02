@@ -109,7 +109,7 @@ internal sealed class DownloadProcessor(DownloadProcessorOptions options, OsuCol
         {
             ZipFile.ExtractToDirectory
             (
-            sourceBeatmapFilePath,
+                sourceBeatmapFilePath,
                 Path.Combine(options.OsuSongsDirectory.FullName, Path.GetFileNameWithoutExtension(sourceBeatmapFilePath)),
                 overwriteFiles: true
             );
