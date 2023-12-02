@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuCollectionDownloader", "OsuCollectionDownloader\OsuCollectionDownloader.csproj", "{B9AB32BF-08CF-48D5-B971-A0429B85ACC9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsuCollectionDownloader.Legacy", "OsuCollectionDownloader.Legacy\OsuCollectionDownloader.Legacy.csproj", "{36401994-D401-4F66-B60B-EC39CDACCF06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B9AB32BF-08CF-48D5-B971-A0429B85ACC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9AB32BF-08CF-48D5-B971-A0429B85ACC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9AB32BF-08CF-48D5-B971-A0429B85ACC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36401994-D401-4F66-B60B-EC39CDACCF06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36401994-D401-4F66-B60B-EC39CDACCF06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36401994-D401-4F66-B60B-EC39CDACCF06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36401994-D401-4F66-B60B-EC39CDACCF06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
