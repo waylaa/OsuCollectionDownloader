@@ -15,7 +15,7 @@ internal static partial class DownloadProcessorLogger
     [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "Could not fetch the metadata or beatmaps from the collection.")]
     internal static partial void UnsuccessfulCollectionFetch(this ILogger logger);
 
-    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "'{BeatmapName} already exists.'")]
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "'{BeatmapName}' already exists.")]
     internal static partial void AlreadyExists(this ILogger logger, string beatmapName);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "'{BeatmapName}' could not be extracted and has been deleted as such.")]
