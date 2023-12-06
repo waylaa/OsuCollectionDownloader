@@ -10,7 +10,7 @@ namespace OsuCollectionDownloader;
 
 internal sealed class Program
 {
-    private static Task<int> Main(string[] args)
+    private static async Task<int> Main(string[] args)
     {
         Option<int> id = new("--id", "The ID of a collection.");
         Option<DirectoryInfo> osuSongsDirectory = new("--osu-songs-directory", "A directory where the downloaded beatmaps will be saved and extracted.");
@@ -39,7 +39,6 @@ internal sealed class Program
                     ctx.ParseResult.GetValueForOption(osuSongsDirectory)!,
                     ctx.ParseResult.GetValueForOption(osdbFileDirectory)
                 ),
-                ctx.BindingContext.GetRequiredService<OsuCollectorService>(),
                 ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
                 ctx.BindingContext.GetRequiredService<ILogger<DownloadProcessor>>()
             );
@@ -47,7 +46,7 @@ internal sealed class Program
             return downloader.DownloadAsync(ctx.GetCancellationToken());
         });
 
-        return new CommandLineBuilder(rootCommand)
+        return await new CommandLineBuilder(rootCommand)
             .UseDefaults()
             .AddMiddleware(middleware =>
             {
@@ -66,9 +65,7 @@ internal sealed class Program
                         client.DefaultRequestHeaders.Accept.Add(new("application/json"));
                         client.DefaultRequestHeaders.Accept.Add(new("application/octet-stream"));
                     })
-                    .Services
-                    .AddSingleton<OsuCollectorService>()
-                    .BuildServiceProvider();
+                    .Services.BuildServiceProvider();
 
                 middleware.BindingContext.AddService(_ => provider.GetRequiredService<IHttpClientFactory>());
                 middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<DownloadProcessor>>());
