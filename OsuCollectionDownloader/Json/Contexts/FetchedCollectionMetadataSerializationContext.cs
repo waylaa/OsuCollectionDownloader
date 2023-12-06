@@ -22,6 +22,6 @@ namespace OsuCollectionDownloader.Json.Contexts;
 [JsonSerializable(typeof(IImmutableList<object>))]
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(int))]
-internal partial class FetchedCollectionMetadataSerializationContext : JsonSerializerContext
+internal sealed partial class FetchedCollectionMetadataSerializationContext : JsonSerializerContext
 {
 }

@@ -22,6 +22,6 @@ namespace OsuCollectionDownloader.Json.Contexts;
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(int?))]
 [JsonSerializable(typeof(double))]
-internal partial class NerinyanSearchResultSerializationContext : JsonSerializerContext
+internal sealed partial class NerinyanSearchResultSerializationContext : JsonSerializerContext
 {
 }

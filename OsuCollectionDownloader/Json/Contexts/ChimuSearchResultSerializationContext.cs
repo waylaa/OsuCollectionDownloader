@@ -11,6 +11,6 @@ namespace OsuCollectionDownloader.Json.Contexts;
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(double))]
-internal partial class ChimuSearchResultSerializationContext : JsonSerializerContext
+internal sealed partial class ChimuSearchResultSerializationContext : JsonSerializerContext
 {
 }
