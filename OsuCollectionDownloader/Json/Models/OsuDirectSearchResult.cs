@@ -3,12 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace OsuCollectionDownloader.Json.Models;
 
-internal sealed record OsuDirectAvailability(
+internal sealed record OsuDirectAvailability
+(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
     [property: JsonPropertyName("more_information")] object MoreInformation
 );
 
-internal sealed record OsuDirectBeatmap(
+internal sealed record OsuDirectBeatmap
+(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("beatmapset_id")] int BeatmapsetId,
     [property: JsonPropertyName("difficulty_rating")] double DifficultyRating,
@@ -38,7 +40,8 @@ internal sealed record OsuDirectBeatmap(
     [property: JsonPropertyName("max_combo")] int? MaxCombo
 );
 
-internal sealed record OsuDirectCovers(
+internal sealed record OsuDirectCovers
+(
     [property: JsonPropertyName("cover")] string Cover,
     [property: JsonPropertyName("cover@2x")] string Cover2x,
     [property: JsonPropertyName("card")] string Card,
@@ -49,17 +52,20 @@ internal sealed record OsuDirectCovers(
     [property: JsonPropertyName("slimcover@2x")] string Slimcover2x
 );
 
-internal sealed record OsuDirectHype(
+internal sealed record OsuDirectHype
+(
     [property: JsonPropertyName("current")] int Current,
     [property: JsonPropertyName("required")] int Required
 );
 
-internal sealed record OsuDirectNominationsSummary(
+internal sealed record OsuDirectNominationsSummary
+(
     [property: JsonPropertyName("current")] int Current,
     [property: JsonPropertyName("required")] int Required
 );
 
-internal sealed record OsuDirectSearchResult(
+internal sealed record OsuDirectSearchResult
+(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("title_unicode")] string TitleUnicode,

@@ -3,12 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace OsuCollectionDownloader.Json.Models;
 
-internal sealed record NerinyanAvailability(
+internal sealed record NerinyanAvailability
+(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
     [property: JsonPropertyName("more_information")] object MoreInformation
 );
 
-internal sealed record NerinyanBeatmap(
+internal sealed record NerinyanBeatmap
+(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("beatmapset_id")] int BeatmapsetId,
     [property: JsonPropertyName("mode")] string Mode,
@@ -39,37 +41,44 @@ internal sealed record NerinyanBeatmap(
     [property: JsonPropertyName("osu_file")] string OsuFile
 );
 
-internal sealed record NerinyanCache(
+internal sealed record NerinyanCache
+(
     [property: JsonPropertyName("video")] bool Video,
     [property: JsonPropertyName("noVideo")] bool NoVideo
 );
 
-internal sealed  record NerinyanDiscussion(
+internal sealed  record NerinyanDiscussion
+(
     [property: JsonPropertyName("enabled")] bool Enabled,
     [property: JsonPropertyName("locked")] bool Locked
 );
 
-internal sealed record NerinyanGenre(
+internal sealed record NerinyanGenre
+(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name
 );
 
-internal sealed record NerinyanHype(
+internal sealed record NerinyanHype
+(
     [property: JsonPropertyName("current")] int? Current,
     [property: JsonPropertyName("required")] int? Required
 );
 
-internal sealed record NerinyanLanguage(
+internal sealed record NerinyanLanguage
+(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name
 );
 
-internal sealed record NerinyanNominationsSummary(
+internal sealed record NerinyanNominationsSummary
+(
     [property: JsonPropertyName("current")] int Current,
     [property: JsonPropertyName("required")] int Required
 );
 
-internal sealed record NerinyanSearchResult(
+internal sealed record NerinyanSearchResult
+(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("artist")] string Artist,
     [property: JsonPropertyName("artist_unicode")] string ArtistUnicode,

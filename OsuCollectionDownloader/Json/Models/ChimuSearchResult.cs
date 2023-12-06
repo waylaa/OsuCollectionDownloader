@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace OsuCollectionDownloader.Json.Models;
 
-internal sealed record ChildrenBeatmap(
+internal sealed record ChildrenBeatmap
+(
     [property: JsonPropertyName("BeatmapId")] int BeatmapId,
     [property: JsonPropertyName("ParentSetId")] int ParentSetId,
     [property: JsonPropertyName("DiffName")] string DiffName,
@@ -29,7 +30,8 @@ internal sealed record ChildrenBeatmap(
     [property: JsonPropertyName("DownloadPath")] string DownloadPath
 );
 
-internal sealed record Datum(
+internal sealed record Datum
+(
     [property: JsonPropertyName("SetId")] int SetId,
     [property: JsonPropertyName("ChildrenBeatmaps")] ImmutableArray<ChildrenBeatmap> ChildrenBeatmaps,
     [property: JsonPropertyName("RankedStatus")] int RankedStatus,

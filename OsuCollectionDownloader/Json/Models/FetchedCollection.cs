@@ -3,12 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace OsuCollectionDownloader.Json.Models;
 
-internal sealed record Availability(
+internal sealed record Availability
+(
     [property: JsonPropertyName("download_disabled")] bool DownloadDisabled,
     [property: JsonPropertyName("more_information")] object MoreInformation
 );
 
-internal sealed record Beatmap(
+internal sealed record Beatmap
+(
     [property: JsonPropertyName("difficulty_rating")] double DifficultyRating,
     [property: JsonPropertyName("count_sliders")] int CountSliders,
     [property: JsonPropertyName("mode_int")] int ModeInt,
@@ -41,7 +43,8 @@ internal sealed record Beatmap(
     [property: JsonPropertyName("status")] string Status
 );
 
-internal sealed record Beatmapset(
+internal sealed record Beatmapset
+(
     [property: JsonPropertyName("submitted_date")] DateTime SubmittedDate,
     [property: JsonPropertyName("nominations_summary")] NominationsSummary NominationsSummary,
     [property: JsonPropertyName("discussion_locked")] bool DiscussionLocked,
@@ -75,7 +78,8 @@ internal sealed record Beatmapset(
     [property: JsonPropertyName("status")] string Status
 );
 
-internal sealed record Covers(
+internal sealed record Covers
+(
     [property: JsonPropertyName("slimcover")] string Slimcover,
     [property: JsonPropertyName("cover@2x")] string Cover2x,
     [property: JsonPropertyName("list")] string List,
@@ -86,17 +90,20 @@ internal sealed record Covers(
     [property: JsonPropertyName("slimcover@2x")] string Slimcover2x
 );
 
-internal sealed record Failtimes(
+internal sealed record Failtimes
+(
     [property: JsonPropertyName("exit")] IImmutableList<int> Exit,
     [property: JsonPropertyName("fail")] IImmutableList<int> Fail
 );
 
-internal sealed record NominationsSummary(
+internal sealed record NominationsSummary
+(
     [property: JsonPropertyName("required")] int Required,
     [property: JsonPropertyName("current")] int Current
 );
 
-internal sealed record FetchedCollection(
+internal sealed record FetchedCollection
+(
     [property: JsonPropertyName("nextPageCursor")] int? NextPageCursor,
     [property: JsonPropertyName("hasMore")] bool HasMore,
     [property: JsonPropertyName("beatmaps")] IImmutableList<Beatmap> Beatmaps
