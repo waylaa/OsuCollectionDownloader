@@ -2,9 +2,11 @@
 
 internal readonly record struct Result<TValue>(TValue Value, Exception Error)
 {
-    internal readonly bool IsSuccessful => Error is null;
+    internal bool IsSucessfulWithValue => IsSuccessful && HasValue;
 
-    internal readonly bool HasValue => Value is not null;
+    private readonly bool IsSuccessful => Error is null;
+
+    private readonly bool HasValue => Value is not null;
 
     public static implicit operator Result<TValue>(TValue value) => new(value, default!);
 
