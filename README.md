@@ -1,37 +1,39 @@
 # OsuCollectionDownloader
-OsuCollectionDownloader is a simple command-line application for downloading collections from [osu!collector](https://osucollector.com/) and optionally, using those collections to generate .osdb files which can be used by [Piotrekol's Collection Manager](https://github.com/Piotrekol/CollectionManager) for collection importing and sharing.
+A command-line application for downloading collections from [osu!collector](https://osucollector.com/) and optionally, using those collections to generate .osdb files which can be used by [Piotrekol's Collection Manager](https://github.com/Piotrekol/CollectionManager) for importing collections in osu! or just sharing them.
 
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
 
 ## Usage
-Get the builds from [here](https://github.com/waylaa/OsuCollectionDownloader/actions) and click on the latest workflow run.
+Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
 
-### Windows 10/11
+### Windows
 
 #### Download a Collection
 ```
-.\OsuCollectionDownloader.exe --id=<osucollector collection id> --osu-songs-directory=<your 'Songs' folder in osu!> 
+.\OsuCollectionDownloader.exe --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> 
 ```
 
 #### Download a Collection and Generate .osdb File
 ```
-.\OsuCollectionDownloader.exe --id=<osucollector collection id> --osu-songs-directory=<your 'Songs' folder in osu!> --osdb-file-directory=<A random directory>
+.\OsuCollectionDownloader.exe --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> --osdb-generation-directory=<A random directory>
 ```
 
 ### MacOS/Linux
 
 #### Download a Collection
 ```
-.\OsuCollectionDownloader --id=<osucollector collection id> --osu-songs-directory=<your 'Songs' folder in osu!> 
+.\OsuCollectionDownloader --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> 
 ```
 
 #### Download a Collection and Generate .osdb File
 ```
-.\OsuCollectionDownloader --id=<osucollector collection id> --osu-songs-directory=<your 'Songs' folder in osu!> --osdb-file-directory=<A random directory>
+.\OsuCollectionDownloader --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> --osdb-generation-directory=<A random directory>
 ```
 
+An additional option for downloading sequentially exists and can be enabled by writing ```--download-sequentially``` alongside the other said options. Only enable this option if you're getting rate-limited by the beatmap mirrors, having a really slow internet connection speed to the point of causing timeouts or experiencing issues with the concurrent downloader.
+
 ## Building/Contributing
-### 1. Prerequisites
+### 1. Prerequisites (Visual Studio Installer)
   - .NET desktop development
   - Desktop development with C++ (Used for AOT publishing)
     
