@@ -1,36 +1,28 @@
-﻿using OsuCollectionDownloader.Json.Models;
-using OsuCollectionDownloader.Objects;
-using OsuCollectionDownloader.Services;
-using System.Collections.Immutable;
+﻿using OsuCollectionDownloader.Objects;
 
 namespace OsuCollectionDownloader.Handlers;
 
-internal class NerinyanHandler(IBeatmapMirrorService service) : IBeatmapMirrorHandler
+internal sealed class NerinyanHandler(HttpClient client) : IMirrorHandler
 {
-    public async Task<Result<bool>> HandleAsync(string title, string difficultyName, string filePath, CancellationToken token)
+    public async Task<Result<bool>> DownloadAsync(string filePath, int beatmapSetId, CancellationToken token)
     {
-        Result<object?> searchResult = await service.SearchAsync(title, token);
-
-        if (!searchResult.IsSuccessful ||
-            !searchResult.HasValue ||
-            searchResult.Value is not ImmutableArray<NerinyanSearchResult?> value ||
-            value.IsDefaultOrEmpty)
+        try
         {
-            return false;
+            using HttpResponseMessage response = await client.GetAsync($"https://api.nerinyan.moe/d/{beatmapSetId}", HttpCompletionOption.ResponseHeadersRead, token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            await using FileStream beatmapStream = File.OpenWrite(filePath);
+            await response.Content.CopyToAsync(beatmapStream, token);
+
+            return true;
         }
-
-        // Get the correct beatmapset id by checking the source and result difficulty names. If they're the same, they're referring to the same beatmap.
-        int beatmapSetId = value
-            .SelectMany(results => results!.Beatmaps)
-            .Where(beatmap => beatmap.Version == difficultyName)
-            .Select(correspondingBeatmap => correspondingBeatmap.BeatmapsetId)
-            .FirstOrDefault();
-
-        if (beatmapSetId == default)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException)
         {
-            return false;
+            return ex;
         }
-
-        return await service.DownloadAsync(filePath, beatmapSetId, token);
     }
 }
