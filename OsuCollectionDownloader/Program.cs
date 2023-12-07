@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OsuCollectionDownloader.Factories;
 using OsuCollectionDownloader.Processors;
-using OsuCollectionDownloader.Services;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -13,37 +13,58 @@ internal sealed class Program
     private static async Task<int> Main(string[] args)
     {
         Option<int> id = new("--id", "The ID of a collection.");
-        Option<DirectoryInfo> osuSongsDirectory = new("--osu-songs-directory", "A directory where the downloaded beatmaps will be saved and extracted.");
-        Option<DirectoryInfo?> osdbFileDirectory = new
+        Option<string> extractionDirectory = new("--extraction-directory", "A directory where the downloaded beatmaps will be saved and extracted.");
+        Option<string?> osdbGenerationDirectory = new
         (
-            "--osdb-file-directory",
+            "--osdb-generation-directory",
             "A directory where a .osdb file will be generated in order to be used by Piotrekol's Collecton Manager. Leave empty if you want to disable the generation of such file."
         );
+        Option<bool> downloadSequentially = new("--download-sequentially", getDefaultValue: () => false, "Whether or not to download the beatmaps concurrently.");
 
         RootCommand rootCommand = new("OsuCollectionDownloader")
         {
             id,
-            osuSongsDirectory,
-            osdbFileDirectory,
+            extractionDirectory,
+            osdbGenerationDirectory,
+            downloadSequentially
         };
 
-        rootCommand.SetHandler((ctx) =>
+        rootCommand.SetHandler(async (ctx) =>
         {
             Console.Title = "OsuCollectionDownloader";
 
-            DownloadProcessor downloader = new
-            (
-                new DownloadProcessorOptions
+            if (ctx.ParseResult.GetValueForOption(downloadSequentially))
+            {
+                SequentialDownloadProcessor processor = DownloadProcessorFactory.Create
                 (
-                    ctx.ParseResult.GetValueForOption(id),
-                    ctx.ParseResult.GetValueForOption(osuSongsDirectory)!,
-                    ctx.ParseResult.GetValueForOption(osdbFileDirectory)
-                ),
-                ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
-                ctx.BindingContext.GetRequiredService<ILogger<DownloadProcessor>>()
-            );
+                    new DownloadProcessorBaseOptions
+                    (
+                        ctx.ParseResult.GetValueForOption(id),
+                        ctx.ParseResult.GetValueForOption(extractionDirectory)!,
+                        ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
+                    ),
+                    ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
+                    ctx.BindingContext.GetRequiredService<ILogger<SequentialDownloadProcessor>>()
+                );
 
-            return downloader.DownloadAsync(ctx.GetCancellationToken());
+                await processor.DownloadAsync(ctx.GetCancellationToken());
+            }
+            else
+            {
+                ConcurrentDownloadProcessor processor = DownloadProcessorFactory.Create
+                (
+                    new DownloadProcessorBaseOptions
+                    (
+                        ctx.ParseResult.GetValueForOption(id),
+                        ctx.ParseResult.GetValueForOption(extractionDirectory)!,
+                        ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
+                    ),
+                    ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
+                    ctx.BindingContext.GetRequiredService<ILogger<ConcurrentDownloadProcessor>>()
+                );
+
+                await processor.DownloadAsync(ctx.GetCancellationToken());
+            }
         });
 
         return await new CommandLineBuilder(rootCommand)
@@ -59,16 +80,25 @@ internal sealed class Program
                         .AddFilter("System.Net.Http.HttpClient.*.ClientHandler", LogLevel.Warning)
                         .SetMinimumLevel(LogLevel.Information);
                     })
-                    .AddHttpClient<DownloadProcessor>(client =>
+                    .AddHttpClient("OsuCollectionDownloaderHttpClient", client =>
                     {
                         client.DefaultRequestHeaders.UserAgent.Add(new("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36"));
                         client.DefaultRequestHeaders.Accept.Add(new("application/json"));
                         client.DefaultRequestHeaders.Accept.Add(new("application/octet-stream"));
+                        client.Timeout = TimeSpan.FromSeconds(30);
                     })
                     .Services.BuildServiceProvider();
 
                 middleware.BindingContext.AddService(_ => provider.GetRequiredService<IHttpClientFactory>());
-                middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<DownloadProcessor>>());
+
+                if (middleware.ParseResult.GetValueForOption(downloadSequentially))
+                {
+                    middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<SequentialDownloadProcessor>>());
+                }
+                else
+                {
+                    middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<ConcurrentDownloadProcessor>>());
+                }
             })
             .Build()
             .InvokeAsync(args);
