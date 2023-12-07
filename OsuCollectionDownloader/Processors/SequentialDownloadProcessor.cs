@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OsuCollectionDownloader.Cache;
 using OsuCollectionDownloader.Extensions;
 using OsuCollectionDownloader.Handlers;
@@ -10,38 +11,41 @@ using System.Collections.Immutable;
 
 namespace OsuCollectionDownloader.Processors;
 
-internal sealed class SequentialDownloadProcessor(DownloadProcessorBaseOptions options, IHttpClientFactory clientFactory, ILogger<SequentialDownloadProcessor> logger) : DownloadProcessorBase(options, clientFactory)
+internal sealed class SequentialDownloadProcessor(
+    DownloadProcessorBaseOptions options,
+    IHttpClientFactory httpFactory,
+    ILogger<SequentialDownloadProcessor> logger) : DownloadProcessorBase(options, httpFactory)
 {
     internal override async Task DownloadAsync(CancellationToken token)
     {
-        if (!options.ExtractionDirectory.Contains(Path.Combine("osu!", "Songs")))
+        if (!Options.ExtractionDirectory.Contains(Path.Combine("osu!", "Songs")))
         {
-            logger.UnsupportedExtractionDirectory(options.ExtractionDirectory);
+            logger.UnsupportedExtractionDirectory(Options.ExtractionDirectory);
         }
 
         logger.OngoingCollectionFetch();
 
-        Result<FetchedCollectionMetadata?> metadataResult = await GetMetadataAsync(options.Id, token);
+        Result<FetchedCollectionMetadata?> metadataResult = await GetMetadataAsync(token);
         if (!metadataResult.IsSucessfulWithValue)
         {
             logger.UnsuccessfulCollectionFetch();
             return;
         }
 
-        Result<ImmutableList<Beatmap>> beatmapsResult = await GetBeatmapsAsync(options.Id, token);
+        Result<ImmutableList<Beatmap>> beatmapsResult = await GetBeatmapsAsync(token);
         if (!beatmapsResult.IsSucessfulWithValue)
         {
             logger.UnsuccessfulCollectionFetch();
             return;
         }
 
-        FrozenDirectoryCache cache = new(options.ExtractionDirectory);
+        FrozenDirectoryCache cache = new(Options.ExtractionDirectory);
 
         MirrorChain mirrorChain =
         [
-            new NerinyanHandler(_client),
-            new ChimuHandler(_client),
-            new OsuDirectHandler(_client),
+            new NerinyanHandler(Client),
+            new ChimuHandler(Client),
+            new OsuDirectHandler(Client),
         ];
 
         List<Beatmap> downloadedBeatmaps = [];
@@ -49,8 +53,8 @@ internal sealed class SequentialDownloadProcessor(DownloadProcessorBaseOptions o
         foreach (Beatmap beatmap in beatmapsResult.Value)
         {
             string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
-            string beatmapFilePath = Path.Combine(options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
-            string beatmapDirectory = Path.Combine(options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
+            string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
+            string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
             if (cache.Items.Contains(beatmapDirectory))
             {
@@ -88,10 +92,10 @@ internal sealed class SequentialDownloadProcessor(DownloadProcessorBaseOptions o
 
         logger.DownloadFinished();
 
-        if (options.OsdbGenerationDirectory is not null)
+        if (Options.OsdbGenerationDirectory is not null)
         {
             await GenerateOsdbCollectionAsync(metadataResult.Value!, [.. downloadedBeatmaps]);
-            logger.OsdbCollectionSuccessfulGeneration(options.OsdbGenerationDirectory);
+            logger.OsdbCollectionSuccessfulGeneration(Options.OsdbGenerationDirectory);
         }
     }
 }

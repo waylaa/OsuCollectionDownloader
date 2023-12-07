@@ -18,19 +18,21 @@ namespace OsuCollectionDownloader.Processors;
 
 internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions options, IHttpClientFactory clientFactory)
 {
-    protected readonly HttpClient _client = clientFactory.CreateClient();
+    protected DownloadProcessorBaseOptions Options { get; } = options;
+
+    protected HttpClient Client { get; } =  clientFactory.CreateClient();
 
     private const string OsuCollectorApiUrl = "https://osucollector.com/api";
 
     internal abstract Task DownloadAsync(CancellationToken token);
 
-    private protected async Task<Result<FetchedCollectionMetadata?>> GetMetadataAsync(int collectionId, CancellationToken token)
+    private protected async Task<Result<FetchedCollectionMetadata?>> GetMetadataAsync(CancellationToken token)
     {
         try
         {
-            return await _client.GetFromJsonAsync
+            return await Client.GetFromJsonAsync
             (
-                $"{OsuCollectorApiUrl}/collections/{collectionId}",
+                $"{OsuCollectorApiUrl}/collections/{Options.Id}",
                 FetchedCollectionMetadataSerializationContext.Default.FetchedCollectionMetadata,
                 token
             );
@@ -48,7 +50,7 @@ internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions optio
             ZipFile.ExtractToDirectory
             (
                 sourceBeatmapFilePath,
-                Path.Combine(options.ExtractionDirectory, Path.GetFileNameWithoutExtension(sourceBeatmapFilePath)),
+                Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(sourceBeatmapFilePath)),
                 overwriteFiles: true
             );
 
@@ -60,15 +62,15 @@ internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions optio
         }
     }
 
-    private protected async Task<Result<ImmutableList<Beatmap>>> GetBeatmapsAsync(int collectionId, CancellationToken token)
+    private protected async Task<Result<ImmutableList<Beatmap>>> GetBeatmapsAsync(CancellationToken token)
     {
         try
         {
             List<Beatmap> beatmaps = [];
 
-            FetchedCollection? collection = await _client.GetFromJsonAsync
+            FetchedCollection? collection = await Client.GetFromJsonAsync
             (
-                $"{OsuCollectorApiUrl}/collections/{collectionId}/beatmapsv2?cursor=0&perPage=100",
+                $"{OsuCollectorApiUrl}/collections/{Options.Id}/beatmapsv2?cursor=0&perPage=100",
                 FetchedCollectionSerializationContext.Default.FetchedCollection,
                 token
             );
@@ -82,9 +84,9 @@ internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions optio
             {
                 beatmaps.AddRange(collection.Beatmaps);
 
-                collection = await _client.GetFromJsonAsync
+                collection = await Client.GetFromJsonAsync
                 (
-                    $"{OsuCollectorApiUrl}/collections/{collectionId}/beatmapsv2?cursor={collection.NextPageCursor}&perPage=100",
+                    $"{OsuCollectorApiUrl}/collections/{Options.Id}/beatmapsv2?cursor={collection.NextPageCursor}&perPage=100",
                     FetchedCollectionSerializationContext.Default.FetchedCollection,
                     token
                 );
@@ -106,7 +108,7 @@ internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions optio
 
     private protected async ValueTask GenerateOsdbCollectionAsync(FetchedCollectionMetadata metadata, ImmutableList<Beatmap> downloadedBeatmaps)
     {
-        string osdbFilePath = Path.Combine(options.OsdbGenerationDirectory!, $"{metadata.Name.ReplaceInvalidPathChars()}.osdb");
+        string osdbFilePath = Path.Combine(Options.OsdbGenerationDirectory!, $"{metadata.Name.ReplaceInvalidPathChars()}.osdb");
 
         await using FileStream osdbFileStream = File.OpenWrite(osdbFilePath);
         await using (BinaryWriter osdbVersionWriter = new(osdbFileStream, Encoding.UTF8, leaveOpen: true))
