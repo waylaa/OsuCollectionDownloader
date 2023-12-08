@@ -11,9 +11,20 @@
 	<InvariantGlobalization>true</InvariantGlobalization>
 	<PublishReadyToRun>true</PublishReadyToRun>
 	<SelfContained>true</SelfContained>
+	<NoWin32Manifest>true</NoWin32Manifest>
 	<RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</RuntimeIdentifier>
 	<RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('OSX'))">osx-x64</RuntimeIdentifier>
 	<RuntimeIdentifier Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</RuntimeIdentifier>
+	<Description>Download and generate .osdb collections from osucollector for free.</Description>
+	<Copyright>Copyright (C) 2023 waylaa</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
