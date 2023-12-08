@@ -6,12 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PublishAot>true</PublishAot>
-	<PublishReadyToRun>true</PublishReadyToRun>
 	<PublishTrimmed>true</PublishTrimmed>
-	<RuntimeIdentifier Condition=" '$(OS)' == 'Windows_NT' ">win-x64</RuntimeIdentifier>
-	<RuntimeIdentifier Condition=" '$(OS)' == 'Unix' ">linux-x64</RuntimeIdentifier>
-	<RuntimeIdentifier Condition=" '$(OS)' == 'Darwin' ">osx-x64</RuntimeIdentifier>
+	<ServerGarbageCollection>false</ServerGarbageCollection>
+	<InvariantGlobalization>true</InvariantGlobalization>
+	<PublishReadyToRun>true</PublishReadyToRun>
 	<SelfContained>true</SelfContained>
+	<RuntimeIdentifier Condition="'$(OS)' == 'Windows_NT'">win-x64</RuntimeIdentifier>
+	<RuntimeIdentifier Condition="'$(OS)' == 'Unix'">linux-x64</RuntimeIdentifier>
+	<RuntimeIdentifier Condition="'$(OS)' == 'Darwin'">osx-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
