@@ -98,7 +98,7 @@ internal abstract class DownloadProcessorBase(DownloadProcessorBaseOptions optio
 
             } while (collection.HasMore || collection.NextPageCursor is not null || token.IsCancellationRequested);
 
-            return beatmaps.ToImmutableList();
+            return beatmaps.DistinctBy(x => x.BeatmapsetId).ToImmutableList();
         }
         catch (Exception ex)
         {

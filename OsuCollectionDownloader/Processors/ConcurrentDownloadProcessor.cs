@@ -61,7 +61,7 @@ internal sealed class ConcurrentDownloadProcessor
                 string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
                 string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
-                if (cache.Items.Contains(beatmapDirectory))
+                if (cache.Directories.Contains(beatmapDirectory))
                 {
                     downloadedBeatmaps.Add(beatmap);
                     logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
