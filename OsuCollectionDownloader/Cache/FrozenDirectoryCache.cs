@@ -11,5 +11,5 @@ namespace OsuCollectionDownloader.Cache;
 
 internal sealed class FrozenDirectoryCache(string path)
 {
-    internal FrozenSet<string> Items { get; } = new HashSet<string>(Directory.EnumerateDirectories(path), StringComparer.OrdinalIgnoreCase).ToFrozenSet();
+    internal FrozenSet<string> Directories { get; } = new HashSet<string>(Directory.EnumerateDirectories(path), StringComparer.OrdinalIgnoreCase).ToFrozenSet();
 }
