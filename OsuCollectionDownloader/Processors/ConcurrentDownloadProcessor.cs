@@ -49,11 +49,11 @@ internal sealed class ConcurrentDownloadProcessor
             new OsuDirectHandler(Client),
         ];
 
-        List<Beatmap> downloadedBeatmaps = [];
+        List<Beatmap> downloadedBeatmapsets = [];
 
         using (SemaphoreSlim concurrencyLimiter = new(initialCount: 2))
         {
-            ImmutableArray<Task> downloads = beatmapsResult.Value.Select(async beatmap =>
+            ImmutableArray<Task> downloads = beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId).Select(async beatmap =>
             {
                 await concurrencyLimiter.WaitAsync(token);
 
@@ -63,7 +63,7 @@ internal sealed class ConcurrentDownloadProcessor
 
                 if (cache.Directories.Contains(beatmapDirectory))
                 {
-                    downloadedBeatmaps.Add(beatmap);
+                    downloadedBeatmapsets.Add(beatmap);
                     logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
 
                     concurrencyLimiter.Release();
@@ -96,7 +96,7 @@ internal sealed class ConcurrentDownloadProcessor
                     return;
                 }
 
-                downloadedBeatmaps.Add(beatmap);
+                downloadedBeatmapsets.Add(beatmap);
                 logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
 
                 concurrencyLimiter.Release();
@@ -110,7 +110,7 @@ internal sealed class ConcurrentDownloadProcessor
 
         if (Options.OsdbGenerationDirectory is not null)
         {
-            await GenerateOsdbCollectionAsync(metadataResult.Value!, [.. downloadedBeatmaps]);
+            await GenerateOsdbCollectionAsync(metadataResult.Value, beatmapsResult.Value.UnionBy(downloadedBeatmapsets, x => x.Version).ToImmutableList());
             logger.OsdbCollectionSuccessfulGeneration(Options.OsdbGenerationDirectory);
         }
     }

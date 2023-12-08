@@ -50,9 +50,9 @@ internal sealed class SequentialDownloadProcessor
             new OsuDirectHandler(Client),
         ];
 
-        List<Beatmap> downloadedBeatmaps = [];
+        List<Beatmap> downloadedBeatmapsets = [];
 
-        foreach (Beatmap beatmap in beatmapsResult.Value)
+        foreach (Beatmap beatmap in beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId))
         {
             string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
             string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
@@ -60,7 +60,7 @@ internal sealed class SequentialDownloadProcessor
 
             if (cache.Directories.Contains(beatmapDirectory))
             {
-                downloadedBeatmaps.Add(beatmap);
+                downloadedBeatmapsets.Add(beatmap);
                 logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
 
                 continue;
@@ -82,7 +82,7 @@ internal sealed class SequentialDownloadProcessor
                 continue;
             }
 
-            downloadedBeatmaps.Add(beatmap);
+            downloadedBeatmapsets.Add(beatmap);
             logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
         }
 
@@ -90,7 +90,7 @@ internal sealed class SequentialDownloadProcessor
 
         if (Options.OsdbGenerationDirectory is not null)
         {
-            await GenerateOsdbCollectionAsync(metadataResult.Value, [.. downloadedBeatmaps]);
+            await GenerateOsdbCollectionAsync(metadataResult.Value, beatmapsResult.Value.UnionBy(downloadedBeatmapsets, x => x.Version).ToImmutableList());
             logger.OsdbCollectionSuccessfulGeneration(Options.OsdbGenerationDirectory);
         }
     }
