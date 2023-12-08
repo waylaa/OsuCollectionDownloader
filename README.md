@@ -5,10 +5,14 @@ I strongly advise not use this application irresponsibly and instead support [os
 
 ## Usage
 1. Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
-
+2. Copy the collection ID from the url of a collection at [osu!collector](https://osucollector.com/). For example:
+   ```https://osucollector.com/collections/xxxx/collection-name```
+   **where xxxx is the ID of the collection.**
+3. Open any terminal and run whichever command you want below.
+   
 ### Windows
 
-#### 2. Download a Collection
+#### Download a Collection
 ```
 .\OsuCollectionDownloader.exe --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> 
 ```
@@ -32,7 +36,7 @@ I strongly advise not use this application irresponsibly and instead support [os
 
 An additional option for downloading sequentially exists and can be enabled by writing ```--download-sequentially``` alongside the other said options. **Only enable this option if you're getting rate-limited by the beatmap mirrors, having a really slow internet connection speed to the point of causing timeouts or experiencing issues with the concurrent downloader.**
 
-3. Open osu! and press F5.
+4. Open osu! and press F5.
 
 ## Building/Contributing
 ### 1. Prerequisites (Visual Studio Installer)
