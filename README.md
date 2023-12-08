@@ -4,16 +4,16 @@ A command-line application for downloading collections from [osu!collector](http
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
 
 ## Usage
-Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
+1. Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
 
 ### Windows
 
-#### Download a Collection
+#### 2. Download a Collection
 ```
 .\OsuCollectionDownloader.exe --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> 
 ```
 
-#### Download a Collection and Generate .osdb File
+#### Download a Collection and Generate a .osdb File
 ```
 .\OsuCollectionDownloader.exe --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> --osdb-generation-directory=<A random directory>
 ```
@@ -25,12 +25,14 @@ Get the latest build from the [Releases](https://github.com/waylaa/OsuCollection
 .\OsuCollectionDownloader --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> 
 ```
 
-#### Download a Collection and Generate .osdb File
+#### Download a Collection and Generate a .osdb File
 ```
 .\OsuCollectionDownloader --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> --osdb-generation-directory=<A random directory>
 ```
 
 An additional option for downloading sequentially exists and can be enabled by writing ```--download-sequentially``` alongside the other said options. **Only enable this option if you're getting rate-limited by the beatmap mirrors, having a really slow internet connection speed to the point of causing timeouts or experiencing issues with the concurrent downloader.**
+
+3. Open osu! and press F5.
 
 ## Building/Contributing
 ### 1. Prerequisites (Visual Studio Installer)
