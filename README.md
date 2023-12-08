@@ -34,7 +34,7 @@ I strongly advise not use this application irresponsibly and instead support [os
 .\OsuCollectionDownloader --id=<osucollector collection id> --extraction-directory=<your 'Songs' folder in osu!> --osdb-generation-directory=<A random directory>
 ```
 
-An additional option for downloading sequentially exists and can be enabled by writing ```--download-sequentially``` alongside the other said options. **Only enable this option if you're getting rate-limited by the beatmap mirrors, having a really slow internet connection speed to the point of causing timeouts or experiencing issues with the concurrent downloader.**
+An additional option for downloading sequentially exists and can be enabled by having the ```--download-sequentially``` option alongside the other said options above. **Only enable this if you're getting rate-limited by the beatmap mirrors, having a really slow internet connection speed to the point of causing timeouts or experiencing issues with the concurrent downloader.**
 
 4. Open osu! and press F5.
 
