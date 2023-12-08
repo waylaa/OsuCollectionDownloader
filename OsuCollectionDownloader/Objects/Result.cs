@@ -1,14 +1,13 @@
-﻿namespace OsuCollectionDownloader.Objects;
+﻿using System.Diagnostics.CodeAnalysis;
 
-internal readonly record struct Result<TValue>(TValue Value, Exception Error)
+namespace OsuCollectionDownloader.Objects;
+
+internal readonly record struct Result<TValue>(TValue? Value, Exception? Error)
 {
-    internal bool IsSucessfulWithValue => IsSuccessful && HasValue;
+    [MemberNotNullWhen(true, nameof(Value))]
+    internal bool IsSucessfulWithValue => Value is not null && Error is null;
 
-    private readonly bool IsSuccessful => Error is null;
+    public static implicit operator Result<TValue>(TValue value) => new(value, null);
 
-    private readonly bool HasValue => Value is not null;
-
-    public static implicit operator Result<TValue>(TValue value) => new(value, default!);
-
-    public static implicit operator Result<TValue>(Exception error) => new(default!, error);
+    public static implicit operator Result<TValue>(Exception error) => new(default, error);
 }
