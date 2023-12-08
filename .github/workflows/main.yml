@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Build for Windows (x64)
-      run: dotnet publish -c Release -r win-x64
+      run: dotnet publish -c Release
 
     - name: Upload x64 Release
       uses: actions/upload-artifact@v3
@@ -43,7 +43,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Build for MacOS (x64)
-      run: dotnet publish -c Release -r osx-x64
+      run: dotnet publish -c Release
       
     - name: Upload Release
       uses: actions/upload-artifact@v3
@@ -64,7 +64,7 @@ jobs:
         dotnet-version: 8.0.x
 
     - name: Build for Linux (x64)
-      run: dotnet publish -c Release -r linux-x64
+      run: dotnet publish -c Release
 
     - name: Upload x64 Release
       uses: actions/upload-artifact@v3
