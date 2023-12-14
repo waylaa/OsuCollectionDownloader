@@ -1,18 +1,11 @@
-﻿using Microsoft.Extensions.Options;
-using OsuCollectionDownloader.Cache;
-using OsuCollectionDownloader.Extensions;
+﻿using OsuCollectionDownloader.Extensions;
 using OsuCollectionDownloader.Json.Contexts;
 using OsuCollectionDownloader.Json.Models;
 using OsuCollectionDownloader.Objects;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace OsuCollectionDownloader.Processors;
 

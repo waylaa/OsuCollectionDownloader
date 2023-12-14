@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using OsuCollectionDownloader.Cache;
 using OsuCollectionDownloader.Extensions;
 using OsuCollectionDownloader.Handlers.Chains;
 using OsuCollectionDownloader.Handlers;
@@ -7,6 +6,9 @@ using OsuCollectionDownloader.Json.Models;
 using OsuCollectionDownloader.Logging;
 using OsuCollectionDownloader.Objects;
 using System.Collections.Immutable;
+using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Frozen;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace OsuCollectionDownloader.Processors;
 
@@ -40,19 +42,21 @@ internal sealed class ConcurrentDownloadProcessor
             return;
         }
 
-        FrozenDirectoryCache cache = new(Options.ExtractionDirectory);
-
-        MirrorChain mirrorChain =
-        [
-            new NerinyanHandler(Client),
-            new ChimuHandler(Client),
-            new OsuDirectHandler(Client),
-        ];
-
         List<Beatmap> downloadedBeatmapsets = [];
 
-        using (SemaphoreSlim concurrencyLimiter = new(initialCount: 2))
+        using (IMemoryCache directoryCache = Program.Services.GetRequiredService<IMemoryCache>())
         {
+            FrozenSet<string> cache = directoryCache.Set("Songs", new HashSet<string>(Directory.EnumerateDirectories(Options.ExtractionDirectory), StringComparer.OrdinalIgnoreCase).ToFrozenSet());
+
+            MirrorChain mirrorChain =
+            [
+                new NerinyanHandler(Client),
+                new ChimuHandler(Client),
+                new OsuDirectHandler(Client),
+            ];
+
+            using SemaphoreSlim concurrencyLimiter = new(initialCount: 2);
+
             ImmutableArray<Task> downloads = beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId).Select(async beatmap =>
             {
                 await concurrencyLimiter.WaitAsync(token);
@@ -61,7 +65,7 @@ internal sealed class ConcurrentDownloadProcessor
                 string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
                 string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
-                if (cache.Directories.Contains(beatmapDirectory))
+                if (cache.Contains(beatmapDirectory))
                 {
                     downloadedBeatmapsets.Add(beatmap);
                     logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
