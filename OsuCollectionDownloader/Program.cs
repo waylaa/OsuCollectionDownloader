@@ -5,11 +5,15 @@ using OsuCollectionDownloader.Processors;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OsuCollectionDownloader;
 
 internal sealed class Program
 {
+    [NotNull]
+    internal static IServiceProvider? Services { get; private set; }
+
     private static async Task<int> Main(string[] args)
     {
         Option<int> id = new("--id", "The ID of a collection.");
@@ -33,45 +37,38 @@ internal sealed class Program
         {
             Console.Title = "OsuCollectionDownloader";
 
-            if (ctx.ParseResult.GetValueForOption(downloadSequentially))
-            {
-                SequentialDownloadProcessor processor = DownloadProcessorFactory.Create
-                (
-                    new DownloadProcessorBaseOptions
-                    (
-                        ctx.ParseResult.GetValueForOption(id),
-                        ctx.ParseResult.GetValueForOption(extractionDirectory)!,
-                        ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
-                    ),
-                    ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
-                    ctx.BindingContext.GetRequiredService<ILogger<SequentialDownloadProcessor>>()
-                );
+            DownloadProcessorBase processor = ctx.ParseResult.GetValueForOption(downloadSequentially)
+                ? DownloadProcessorFactory.Create
+                  (
+                      new DownloadProcessorBaseOptions
+                      (
+                          ctx.ParseResult.GetValueForOption(id),
+                          ctx.ParseResult.GetValueForOption(extractionDirectory)!,
+                          ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
+                      ),
+                      Services.GetRequiredService<IHttpClientFactory>(),
+                      Services.GetRequiredService<ILogger<SequentialDownloadProcessor>>()
+                  )
+                : DownloadProcessorFactory.Create
+                  (
+                      new DownloadProcessorBaseOptions
+                      (
+                          ctx.ParseResult.GetValueForOption(id),
+                          ctx.ParseResult.GetValueForOption(extractionDirectory)!,
+                          ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
+                      ),
+                      Services.GetRequiredService<IHttpClientFactory>(),
+                      Services.GetRequiredService<ILogger<ConcurrentDownloadProcessor>>()
+                  );
 
-                await processor.DownloadAsync(ctx.GetCancellationToken());
-            }
-            else
-            {
-                ConcurrentDownloadProcessor processor = DownloadProcessorFactory.Create
-                (
-                    new DownloadProcessorBaseOptions
-                    (
-                        ctx.ParseResult.GetValueForOption(id),
-                        ctx.ParseResult.GetValueForOption(extractionDirectory)!,
-                        ctx.ParseResult.GetValueForOption(osdbGenerationDirectory)
-                    ),
-                    ctx.BindingContext.GetRequiredService<IHttpClientFactory>(),
-                    ctx.BindingContext.GetRequiredService<ILogger<ConcurrentDownloadProcessor>>()
-                );
-
-                await processor.DownloadAsync(ctx.GetCancellationToken());
-            }
+            await processor.DownloadAsync(ctx.GetCancellationToken());
         });
 
         return await new CommandLineBuilder(rootCommand)
             .UseDefaults()
             .AddMiddleware(middleware =>
             {
-                IServiceProvider provider = new ServiceCollection()
+                Services = new ServiceCollection()
                     .AddLogging(loggingBuilder =>
                     {
                         loggingBuilder
@@ -86,19 +83,10 @@ internal sealed class Program
                         client.DefaultRequestHeaders.Accept.Add(new("application/json"));
                         client.DefaultRequestHeaders.Accept.Add(new("application/octet-stream"));
                         client.Timeout = TimeSpan.FromSeconds(30);
-                    })
-                    .Services.BuildServiceProvider();
 
-                middleware.BindingContext.AddService(_ => provider.GetRequiredService<IHttpClientFactory>());
-
-                if (middleware.ParseResult.GetValueForOption(downloadSequentially))
-                {
-                    middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<SequentialDownloadProcessor>>());
-                }
-                else
-                {
-                    middleware.BindingContext.AddService(_ => provider.GetRequiredService<ILogger<ConcurrentDownloadProcessor>>());
-                }
+                    }).Services
+                    .AddMemoryCache()
+                    .BuildServiceProvider();
             })
             .Build()
             .InvokeAsync(args);
