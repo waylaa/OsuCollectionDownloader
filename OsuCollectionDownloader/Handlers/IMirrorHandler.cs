@@ -1,6 +1,6 @@
 ﻿using OsuCollectionDownloader.Objects;
 
-namespace OsuCollectionDownloader.Handlers.Abstractions;
+namespace OsuCollectionDownloader.Handlers;
 
 internal interface IMirrorHandler
 {

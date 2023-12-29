@@ -57,7 +57,7 @@ internal sealed record Beatmapset
     [property: JsonPropertyName("discussion_enabled")] bool DiscussionEnabled,
     [property: JsonPropertyName("is_scoreable")] bool IsScoreable,
     [property: JsonPropertyName("can_be_hyped")] bool CanBeHyped,
-    [property: JsonPropertyName("ratings")] IReadOnlyList<int> Ratings,
+    [property: JsonPropertyName("ratings")] IImmutableList<int> Ratings,
     [property: JsonPropertyName("ranked")] int Ranked,
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("legacy_thread_url")] string LegacyThreadUrl,
@@ -92,8 +92,8 @@ internal sealed record Covers
 
 internal sealed record Failtimes
 (
-    [property: JsonPropertyName("exit")] IReadOnlyList<int> Exit,
-    [property: JsonPropertyName("fail")] IReadOnlyList<int> Fail
+    [property: JsonPropertyName("exit")] IImmutableList<int> Exit,
+    [property: JsonPropertyName("fail")] IImmutableList<int> Fail
 );
 
 internal sealed record NominationsSummary
@@ -106,5 +106,5 @@ internal sealed record FetchedCollection
 (
     [property: JsonPropertyName("nextPageCursor")] int? NextPageCursor,
     [property: JsonPropertyName("hasMore")] bool HasMore,
-    [property: JsonPropertyName("beatmaps")] IReadOnlyList<Beatmap> Beatmaps
+    [property: JsonPropertyName("beatmaps")] IImmutableList<Beatmap> Beatmaps
 );

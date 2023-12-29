@@ -1,5 +1,4 @@
-﻿using OsuCollectionDownloader.Handlers.Abstractions;
-using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Objects;
 
 namespace OsuCollectionDownloader.Handlers;
 

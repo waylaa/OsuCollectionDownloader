@@ -11,7 +11,7 @@ internal sealed record PartialBeatmap
 
 internal sealed record PartialBeatmapset
 (
-    [property: JsonPropertyName("beatmaps")] IReadOnlyList<PartialBeatmap> Beatmaps,
+    [property: JsonPropertyName("beatmaps")] IImmutableList<PartialBeatmap> Beatmaps,
     [property: JsonPropertyName("id")] int Id
 );
 
@@ -38,7 +38,7 @@ internal sealed record BpmSpread
 internal sealed record Comment
 (
     [property: JsonPropertyName("date")] Date Date,
-    [property: JsonPropertyName("upvotes")] IReadOnlyList<int> Upvotes,
+    [property: JsonPropertyName("upvotes")] IImmutableList<int> Upvotes,
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("message")] string Message,
     [property: JsonPropertyName("userId")] int UserId,
@@ -94,14 +94,14 @@ internal sealed record FetchedCollectionMetadata
     [property: JsonPropertyName("beatmapCount")] int BeatmapCount,
     [property: JsonPropertyName("dateLastModified")] DateLastModified DateLastModified,
     [property: JsonPropertyName("unsubmittedBeatmapCount")] int UnsubmittedBeatmapCount,
-    [property: JsonPropertyName("unknownChecksums")] IReadOnlyList<object> UnknownChecksums,
-    [property: JsonPropertyName("beatmapsets")] IReadOnlyList<Beatmapset> Beatmapsets,
+    [property: JsonPropertyName("unknownChecksums")] IImmutableList<object> UnknownChecksums,
+    [property: JsonPropertyName("beatmapsets")] IImmutableList<Beatmapset> Beatmapsets,
     [property: JsonPropertyName("modes")] Modes Modes,
     [property: JsonPropertyName("difficultySpread")] DifficultySpread DifficultySpread,
     [property: JsonPropertyName("bpmSpread")] BpmSpread BpmSpread,
     [property: JsonPropertyName("description")] string Description,
-    [property: JsonPropertyName("comments")] IReadOnlyList<Comment> Comments,
-    [property: JsonPropertyName("favouritedBy")] IReadOnlyList<int> FavouritedBy,
+    [property: JsonPropertyName("comments")] IImmutableList<Comment> Comments,
+    [property: JsonPropertyName("favouritedBy")] IImmutableList<int> FavouritedBy,
     [property: JsonPropertyName("favourites")] int Favourites
 );
 
