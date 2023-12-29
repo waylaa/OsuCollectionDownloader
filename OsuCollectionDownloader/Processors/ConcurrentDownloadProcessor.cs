@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Frozen;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace OsuCollectionDownloader.Processors;
 
@@ -44,71 +45,65 @@ internal sealed class ConcurrentDownloadProcessor
 
         List<Beatmap> downloadedBeatmapsets = [];
 
-        using (IMemoryCache directoryCache = Program.Services.GetRequiredService<IMemoryCache>())
+        IReadOnlyList<string> cachedBeatmapFolders = Program.Services
+            .GetRequiredService<IMemoryCache>()
+            .Set("Songs", Directory.EnumerateDirectories(Options.ExtractionDirectory).ToList().AsReadOnly());
+
+        MirrorChain mirrorChain =
+        [
+            new NerinyanHandler(Client),
+            new ChimuHandler(Client),
+            new OsuDirectHandler(Client),
+        ];
+
+        using SemaphoreSlim concurrencyLimiter = new(initialCount: 2);
+
+        IReadOnlyList<Task> downloads = beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId).Select(async beatmap =>
         {
-            FrozenSet<string> cache = directoryCache.Set("Songs", new HashSet<string>(Directory.EnumerateDirectories(Options.ExtractionDirectory), StringComparer.OrdinalIgnoreCase).ToFrozenSet());
+            await concurrencyLimiter.WaitAsync(token);
 
-            MirrorChain mirrorChain =
-            [
-                new NerinyanHandler(Client),
-                new ChimuHandler(Client),
-                new OsuDirectHandler(Client),
-            ];
+            string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
+            string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
+            string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
-            using SemaphoreSlim concurrencyLimiter = new(initialCount: 2);
-
-            ImmutableArray<Task> downloads = beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId).Select(async beatmap =>
+            if (cachedBeatmapFolders.Contains(beatmapDirectory))
             {
-                await concurrencyLimiter.WaitAsync(token);
-
-                string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
-                string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
-                string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
-
-                if (cache.Contains(beatmapDirectory))
-                {
-                    downloadedBeatmapsets.Add(beatmap);
-                    logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
-
-                    concurrencyLimiter.Release();
-                    return;
-                }
-
-                Result<bool> downloadResult = await mirrorChain.HandleAsync
-                (
-                    beatmapFilePath,
-                    beatmap.BeatmapsetId,
-                    token
-                );
-
-                if (!downloadResult.IsSucessfulWithValue || !downloadResult.Value)
-                {
-                    logger.UnsuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
-
-                    concurrencyLimiter.Release();
-                    return;
-                }
-
-                Result<bool> extractionResult = Extract(beatmapFilePath);
-                File.Delete(beatmapFilePath);
-
-                if (!extractionResult.IsSucessfulWithValue || !extractionResult.Value)
-                {
-                    logger.ExtractionFailure(Path.GetFileNameWithoutExtension(beatmapFileName));
-
-                    concurrencyLimiter.Release();
-                    return;
-                }
-
                 downloadedBeatmapsets.Add(beatmap);
-                logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
+                logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
 
                 concurrencyLimiter.Release();
+                return;
+            }
 
-            }).ToImmutableArray();
+            Result<bool> downloadResult = await mirrorChain.HandleAsync(beatmapFilePath, beatmap.BeatmapsetId, token);
 
-            await Task.WhenAll(downloads);
-        }
+            if (!downloadResult.IsSucessfulWithValue || !downloadResult.Value)
+            {
+                logger.UnsuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
+
+                concurrencyLimiter.Release();
+                return;
+            }
+
+            Result<bool> extractionResult = Extract(beatmapFilePath);
+            File.Delete(beatmapFilePath);
+
+            if (!extractionResult.IsSucessfulWithValue || !extractionResult.Value)
+            {
+                logger.ExtractionFailure(Path.GetFileNameWithoutExtension(beatmapFileName));
+
+                concurrencyLimiter.Release();
+                return;
+            }
+
+            downloadedBeatmapsets.Add(beatmap);
+            logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
+
+            concurrencyLimiter.Release();
+
+        }).ToList().AsReadOnly();
+
+        await Task.WhenAll(downloads);
 
         logger.DownloadFinished();
 

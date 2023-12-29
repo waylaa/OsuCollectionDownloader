@@ -44,50 +44,49 @@ internal sealed class SequentialDownloadProcessor
 
         List<Beatmap> downloadedBeatmapsets = [];
 
-        using (IMemoryCache directoryCache = Program.Services.GetRequiredService<IMemoryCache>())
+        IReadOnlyList<string> cachedBeatmapFolders = Program.Services
+            .GetRequiredService<IMemoryCache>()
+            .Set("Songs", Directory.EnumerateDirectories(Options.ExtractionDirectory).ToList().AsReadOnly());
+
+        MirrorChain mirrorChain =
+        [
+            new NerinyanHandler(Client),
+            new ChimuHandler(Client),
+            new OsuDirectHandler(Client),
+        ];
+
+        foreach (Beatmap beatmap in beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId))
         {
-            FrozenSet<string> cache = directoryCache.Set("Songs", new HashSet<string>(Directory.EnumerateDirectories(Options.ExtractionDirectory), StringComparer.OrdinalIgnoreCase).ToFrozenSet());
+            string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
+            string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
+            string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
 
-            MirrorChain mirrorChain =
-            [
-                new NerinyanHandler(Client),
-                new ChimuHandler(Client),
-                new OsuDirectHandler(Client),
-            ];
-
-            foreach (Beatmap beatmap in beatmapsResult.Value.DistinctBy(x => x.BeatmapsetId))
+            if (cachedBeatmapFolders.Contains(beatmapDirectory))
             {
-                string beatmapFileName = $"{beatmap.BeatmapsetId} {beatmap.Beatmapset.Artist} - {beatmap.Beatmapset.Title}.osz";
-                string beatmapFilePath = Path.Combine(Options.ExtractionDirectory, beatmapFileName.ReplaceInvalidPathChars());
-                string beatmapDirectory = Path.Combine(Options.ExtractionDirectory, Path.GetFileNameWithoutExtension(beatmapFileName.ReplaceInvalidPathChars()));
-
-                if (cache.Contains(beatmapDirectory))
-                {
-                    downloadedBeatmapsets.Add(beatmap);
-                    logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
-
-                    continue;
-                }
-
-                Result<bool> downloadResult = await mirrorChain.HandleAsync(beatmapFilePath, beatmap.BeatmapsetId, token);
-                if (!downloadResult.IsSucessfulWithValue || !downloadResult.Value)
-                {
-                    logger.UnsuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
-                    continue;
-                }
-
-                Result<bool> extractionResult = Extract(beatmapFilePath);
-                File.Delete(beatmapFilePath);
-
-                if (!extractionResult.IsSucessfulWithValue || !extractionResult.Value)
-                {
-                    logger.ExtractionFailure(Path.GetFileNameWithoutExtension(beatmapFileName));
-                    continue;
-                }
-
                 downloadedBeatmapsets.Add(beatmap);
-                logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
+                logger.AlreadyExists(Path.GetFileNameWithoutExtension(beatmapFileName));
+
+                continue;
             }
+
+            Result<bool> downloadResult = await mirrorChain.HandleAsync(beatmapFilePath, beatmap.BeatmapsetId, token);
+            if (!downloadResult.IsSucessfulWithValue || !downloadResult.Value)
+            {
+                logger.UnsuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
+                continue;
+            }
+
+            Result<bool> extractionResult = Extract(beatmapFilePath);
+            File.Delete(beatmapFilePath);
+
+            if (!extractionResult.IsSucessfulWithValue || !extractionResult.Value)
+            {
+                logger.ExtractionFailure(Path.GetFileNameWithoutExtension(beatmapFileName));
+                continue;
+            }
+
+            downloadedBeatmapsets.Add(beatmap);
+            logger.SuccessfulDownload(Path.GetFileNameWithoutExtension(beatmapFileName));
         }
 
         logger.DownloadFinished();
