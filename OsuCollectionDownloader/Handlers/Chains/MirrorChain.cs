@@ -1,11 +1,16 @@
-﻿using OsuCollectionDownloader.Objects;
+﻿using OsuCollectionDownloader.Handlers.Abstractions;
+using OsuCollectionDownloader.Objects;
 using System.Collections;
 
 namespace OsuCollectionDownloader.Handlers.Chains;
 
-internal sealed class MirrorChain : IEnumerable<IMirrorHandler>
+internal sealed class MirrorChain : IReadOnlyList<IMirrorHandler>
 {
-    private readonly HashSet<IMirrorHandler> _mirrors = [];
+    private readonly List<IMirrorHandler> _mirrors = [];
+
+    public int Count => _mirrors.Count;
+
+    public IMirrorHandler this[int index] => _mirrors[index];
 
     public IEnumerator<IMirrorHandler> GetEnumerator()
         => _mirrors.GetEnumerator();
