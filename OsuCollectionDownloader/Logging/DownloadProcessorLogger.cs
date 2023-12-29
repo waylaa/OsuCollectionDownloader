@@ -4,9 +4,14 @@ namespace OsuCollectionDownloader.Logging;
 
 internal static partial class DownloadProcessorLogger
 {
-    [LoggerMessage(EventId = 0, Level = LogLevel.Warning, Message = "The specified directory '{extractionDirectory}' does not point to the 'Songs' folder within your osu! directory. " +
-        "Failing to do so prevents the application from checking for existing beatmaps, potentially slowing down the download progress and extracted beatmaps will not be able to be " +
-        "saved in the 'Songs' folder.")]
+    [LoggerMessage
+    (
+        EventId = 0,
+        Level = LogLevel.Warning,
+        Message = "The specified directory '{extractionDirectory}' does not point to the 'Songs' folder within your osu! directory. " +
+        "Failing to do so prevents the application from checking for existing beatmaps, potentially slowing down the download progress " +
+        "and extracted beatmaps will not be able to be saved in the 'Songs' folder."
+    )]
     internal static partial void UnsupportedExtractionDirectory(this ILogger logger, string extractionDirectory);
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Attempting to fetch the metadata and beatmaps from the collection. This may take a while.")]
