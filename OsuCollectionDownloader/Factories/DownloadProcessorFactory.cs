@@ -12,26 +12,20 @@ namespace OsuCollectionDownloader.Factories;
 
 internal sealed class DownloadProcessorFactory
 {
-    private delegate T DownloadProcessorConstructor<T>(DownloadProcessorBaseOptions options, IHttpClientFactory clientFactory, ILogger<T> logger);
-
-    private static readonly FrozenDictionary<Type, Delegate> _constructors;
-
-    static DownloadProcessorFactory()
+    private static readonly FrozenDictionary<Type, Delegate> _constructors = new Dictionary<Type, Delegate>
     {
-        Dictionary<Type, Delegate> constructors = new()
         {
-            {
-                typeof(SequentialDownloadProcessor),
-                new DownloadProcessorConstructor<SequentialDownloadProcessor>((options, clientFactory, logger) => new SequentialDownloadProcessor(options, clientFactory, logger))
-            },
-            {
-                typeof(ConcurrentDownloadProcessor),
-                new DownloadProcessorConstructor<ConcurrentDownloadProcessor>((options, clientFactory, logger) => new ConcurrentDownloadProcessor(options, clientFactory, logger))
-            }
-        };
+            typeof(SequentialDownloadProcessor),
+            new DownloadProcessorConstructor<SequentialDownloadProcessor>((options, clientFactory, logger) => new SequentialDownloadProcessor(options, clientFactory, logger))
+        },
+        {
+            typeof(ConcurrentDownloadProcessor),
+            new DownloadProcessorConstructor<ConcurrentDownloadProcessor>((options, clientFactory, logger) => new ConcurrentDownloadProcessor(options, clientFactory, logger))
+        }
 
-        _constructors = constructors.ToFrozenDictionary();
-    }
+    }.ToFrozenDictionary();
+
+    private delegate T DownloadProcessorConstructor<T>(DownloadProcessorBaseOptions options, IHttpClientFactory clientFactory, ILogger<T> logger);
 
     internal static T Create<T>(DownloadProcessorBaseOptions options, IHttpClientFactory clientFactory, ILogger<T> logger) where T : class
         => ((DownloadProcessorConstructor<T>)_constructors.GetValueRefOrNullRef(typeof(T)))(options, clientFactory, logger); // Casts the ref delegate and invokes it.
