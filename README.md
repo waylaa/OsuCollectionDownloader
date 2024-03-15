@@ -4,7 +4,7 @@ A command-line application for downloading collections from [osu!collector](http
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
 
 ## Usage
-1. Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
+1. Get the latest build from the [Github Actions](https://github.com/waylaa/OsuCollectionDownloader/actions) page.
 2. Copy the collection ID from the url of a collection at [osu!collector](https://osucollector.com/). For example:
    ```https://osucollector.com/collections/xxxx/collection-name```
    **where xxxx is the ID of the collection.**
