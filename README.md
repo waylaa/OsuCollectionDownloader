@@ -65,4 +65,4 @@ git clone https://github.com/waylaa/OsuCollectionDownloader.git
 This project is not endorsed by or affiliated with [osu!](https://osu.ppy.sh), [osu!collector](https://osucollector.com/) and [Piotrekol's Collection Manager](https://github.com/Piotrekol/CollectionManager). Any mention of products, services, or entities is for informational purposes only and does not constitute an endorsement.
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+[GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
