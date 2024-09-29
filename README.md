@@ -4,7 +4,7 @@ A command-line application for downloading collections from [osu!collector](http
 I strongly advise not use this application irresponsibly and instead support [osu!collector](https://osucollector.com/client).
 
 ## Usage
-1. Get the latest build from the [Github Actions](https://github.com/waylaa/OsuCollectionDownloader/actions) page.
+1. Get the latest build from the [Releases](https://github.com/waylaa/OsuCollectionDownloader/releases) page.
 2. Copy the collection ID from the url of a collection at [osu!collector](https://osucollector.com/). For example:
    ```https://osucollector.com/collections/xxxx/collection-name```
    **where xxxx is the ID of the collection.**
@@ -48,7 +48,7 @@ An additional option for downloading sequentially exists and can be enabled by h
 - If not installed, download and install it from [here](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
 
 ### 3. Clone
-- Open your terminal or command prompt.
+- Open your preferred terminal.
 - Navigate to the directory where you want to clone the repository:
 ```
 cd <dir>
